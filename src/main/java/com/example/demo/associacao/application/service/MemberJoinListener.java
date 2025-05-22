@@ -37,7 +37,7 @@ public class MemberJoinListener extends ListenerAdapter {
         String token = associacaoService.gerarOuObterLinkConvite(username);
 
         String url = urlInstancia + String.format(
-            ":8080/api/associacao/%s/%s/associar-discord?token=%s",
+            "/api/associacao/%s/%s/associar-discord?token=%s",
             username, discordId, token
         );
 
