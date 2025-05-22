@@ -51,4 +51,12 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		log.info("[finaliza] AssociacaoApplicationService - associarUsuario");
 	}
 
+	@Override
+	public AssociacaoDiscord buscaPorToken(String token) {
+		log.info("[inicia] AssociacaoApplicationService - buscaPorToken");
+		AssociacaoDiscord associacao = repository.findByToken(token)
+				.orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Associacao não encontrada"));
+		return associacao;
+	}
+
 }

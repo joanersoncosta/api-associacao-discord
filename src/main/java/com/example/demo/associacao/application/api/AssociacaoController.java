@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.associacao.application.service.AssociacaoService;
+import com.example.demo.associacao.domain.AssociacaoDiscord;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -32,8 +33,8 @@ public class AssociacaoController {
 		log.info("[finaliza] AssociacaoController - associarContaDiscord");
 	}
 
-	@PostMapping("/gerar-link")
-	public String gerarLinkConvite(@RequestParam String nomeUsuario) {
+	@PostMapping("/{nomeUsuario}/gerar-link")
+	public String gerarLinkConvite(@PathVariable String nomeUsuario) {
 		log.info("[inicia] AssociacaoController - gerarLinkConvite");
 		String link = associacaoService.gerarOuObterLinkConvite(nomeUsuario);
 		log.info("[finaliza] AssociacaoController - gerarLinkConvite");
@@ -43,5 +44,10 @@ public class AssociacaoController {
 	@GetMapping("/")
 	public ResponseEntity<String> olaHome() {
 		return ResponseEntity.ok("Olaaa home");
+	}
+	
+	@GetMapping("/{token}")
+	public AssociacaoDiscord buscaPorToken(@PathVariable String token) {
+		return associacaoService.buscaPorToken(token);
 	}
 }
