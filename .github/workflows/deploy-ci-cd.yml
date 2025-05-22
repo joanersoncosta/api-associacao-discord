@@ -84,3 +84,4 @@ jobs:
               -p 8080:8080 \
               joanersoncosta/associacao-discord:latest
           EOF
+          
