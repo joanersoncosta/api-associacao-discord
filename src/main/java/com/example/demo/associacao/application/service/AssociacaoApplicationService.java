@@ -1,5 +1,7 @@
 package com.example.demo.associacao.application.service;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -57,6 +59,11 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		AssociacaoDiscord associacao = repository.findByToken(token)
 				.orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Associacao não encontrada"));
 		return associacao;
+	}
+
+	@Override
+	public List<AssociacaoDiscord> lista() {
+		return repository.findAll();
 	}
 
 }
