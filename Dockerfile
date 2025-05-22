@@ -14,8 +14,9 @@ ARG DATASOURCE_USER
 ARG DATASOURCE_PASS
 ARG ID_CHANNEL_DISCORD
 ARG DISCORD_TOKEN
-
+ARG AWS_URL
 # Copia o .jar gerado na etapa anterior
+
 COPY --from=build /app/target/*.jar app.jar
 
 # Define variáveis de ambiente (acessíveis pelo Spring via ${})
@@ -24,6 +25,7 @@ ENV DATASOURCE_USER=${DATASOURCE_USER}
 ENV DATASOURCE_PASS=${DATASOURCE_PASS}
 ENV ID_CHANNEL_DISCORD=${ID_CHANNEL_DISCORD}
 ENV DISCORD_TOKEN=${DISCORD_TOKEN}
+ENV AWS_URL=$AWS_URL
 
 # Expõe a porta da aplicação (caso queira)
 EXPOSE 8080
