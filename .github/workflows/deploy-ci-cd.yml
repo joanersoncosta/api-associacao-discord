@@ -73,7 +73,6 @@ jobs:
             # Para o container antigo, se estiver rodando
             docker stop associacao-discord || true
             docker rm associacao-discord || true
-
             # Sobe novo container na porta 8080 com as variáveis necessárias
             docker run -d --name associacao-discord \
               -e DATASOURCE_URL=${{ secrets.DATASOURCE_URL }} \
