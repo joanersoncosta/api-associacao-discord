@@ -1,11 +1,11 @@
 package com.example.demo.associacao.application.service;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
-import com.example.demo.associacao.comunicacao.ComunicacaoClient;
+import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -13,27 +13,74 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import reactor.core.publisher.Mono;
 
 @Log4j2
 @Component
 @RequiredArgsConstructor
 public class MemberJoinListener extends ListenerAdapter {
-	private final AssociacaoService associacaoService;
-	private final ComunicacaoClient client;
-    
-	@Override
-	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
-		Member member = event.getMember();
-		User user = member.getUser();
 
-		String username = user.getName();
-		String discordId = user.getId();
+    private final AssociacaoService associacaoService;
 
-		String token = associacaoService.gerarOuObterLinkConvite(username);
-		client.associarContaDiscord(username, discordId, token);
-		log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
-	}
+    @Override
+    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+        log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
+
+        Member member = event.getMember();
+        User user = member.getUser();
+
+        String username = user.getName();
+        String discordId = user.getId();
+
+        String token = associacaoService.gerarOuObterLinkConvite(username);
+
+        // Monte a URL
+        String url = String.format(
+            "http://localhost:8080/api/associacao/%s/%s/associar-discord?token=%s",
+            username, discordId, token
+        );
+
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .POST(HttpRequest.BodyPublishers.noBody())
+                .build();
+
+            client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                .thenAccept(response -> log.info("Resposta da API: {}", response.body()))
+                .exceptionally(ex -> {
+                    log.error("Erro ao chamar API: {}", ex.getMessage());
+                    return null;
+                });
+        } catch (Exception e) {
+            log.error("Erro ao montar requisição HTTP", e);
+        }
+
+        // (2) Envia DM com o link para o usuário (opcional)
+        String mensagem = "Olá " + username + "! 👋\nClique aqui para associar sua conta: " + url;
+        user.openPrivateChannel()
+            .flatMap(channel -> channel.sendMessage(mensagem))
+            .queue(
+                success -> log.info("Mensagem enviada para {}", username),
+                error -> log.warn("Erro ao enviar DM para {}: {}", username, error.getMessage())
+            );
+
+        log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
+    }
+
+//	@Override
+//	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+//		log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
+//		Member member = event.getMember();
+//		User user = member.getUser();
+//
+//		String username = user.getName();
+//		String discordId = user.getId();
+//
+//		String token = associacaoService.gerarOuObterLinkConvite(username);
+//		associacaoService.associarUsuario(username, discordId, token);
+////		client.associarContaDiscord(username, discordId, token);
+//		log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
+//	}
 
 }
