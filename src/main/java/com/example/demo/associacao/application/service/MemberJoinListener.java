@@ -5,6 +5,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,9 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class MemberJoinListener extends ListenerAdapter {
 
     private final AssociacaoService associacaoService;
-
+	@Value("${aws.url}")
+	private String urlInstancia;
+	
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
@@ -33,9 +36,8 @@ public class MemberJoinListener extends ListenerAdapter {
 
         String token = associacaoService.gerarOuObterLinkConvite(username);
 
-        // Monte a URL
-        String url = String.format(
-            "http://localhost:8080/api/associacao/%s/%s/associar-discord?token=%s",
+        String url = urlInstancia + String.format(
+            ":8080/api/associacao/%s/%s/associar-discord?token=%s",
             username, discordId, token
         );
 
@@ -56,7 +58,6 @@ public class MemberJoinListener extends ListenerAdapter {
             log.error("Erro ao montar requisição HTTP", e);
         }
 
-        // (2) Envia DM com o link para o usuário (opcional)
         String mensagem = "Olá " + username + "! 👋\nClique aqui para associar sua conta: " + url;
         user.openPrivateChannel()
             .flatMap(channel -> channel.sendMessage(mensagem))
