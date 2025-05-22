@@ -8,7 +8,7 @@ spring:
 
  datasource:
     driver-class-name: org.postgresql.Driver
-    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/clientemsdb?currentSchema=discord}
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/clientemsdb?currentSchema=public}
     username: ${DATASOURCE_USER:postgres}
     password: ${DATASOURCE_PASS:postgres}
     type: com.zaxxer.hikari.HikariDataSource
