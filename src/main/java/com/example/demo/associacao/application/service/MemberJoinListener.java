@@ -37,7 +37,7 @@ public class MemberJoinListener extends ListenerAdapter {
 	}
 
 	public void associarContaDiscord(String username, String discordId, String token) {
-		String uri = String.format(urlInstancia + "/api/associacao/%s/%s/associar-discord?token=%s", username,
+		String uri = String.format(urlInstancia + "/api/associacao/%s/%s/%s/associar-discord", username,
 				discordId, token);
 		try {
 			String response = webClient.patch()
