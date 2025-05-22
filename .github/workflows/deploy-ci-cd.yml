@@ -49,4 +49,37 @@ jobs:
         docker tag joanersoncosta/associacao-discord:latest joanersoncosta/associacao-discord:${{ github.run_id }}
         docker push joanersoncosta/associacao-discord:latest
         docker push joanersoncosta/associacao-discord:${{ github.run_id }}
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Configure SSH
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.DEPLOY_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Deploy via SSH
+      run: |
+        ssh ${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }} << 'EOF'
+          docker pull joanersoncosta/associacao-discord:latest
+
+          # Para o container antigo, se estiver rodando
+          docker stop associacao-discord || true
+          docker rm associacao-discord || true
+
+          # Sobe novo container na porta 8080 com as variáveis necessárias
+          docker run -d --name associacao-discord \
+            -e DATASOURCE_URL=${{ secrets.DATASOURCE_URL }} \
+            -e DATASOURCE_USER=${{ secrets.DATASOURCE_USER }} \
+            -e DATASOURCE_PASS=${{ secrets.DATASOURCE_PASS }} \
+            -e ID_CHANNEL_DISCORD=${{ secrets.ID_CHANNEL_DISCORD }} \
+            -e DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }} \
+            -p 8080:8080 \
+            joanersoncosta/associacao-discord:latest
+        EOF
+        
         
