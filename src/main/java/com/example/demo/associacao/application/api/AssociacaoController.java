@@ -23,10 +23,10 @@ import lombok.extern.log4j.Log4j2;
 public class AssociacaoController {
 	private final AssociacaoService associacaoService;
 
-	@PatchMapping("/{username}/{discordId}/associar-discord")
+	@PatchMapping("/{username}/{discordId}/{token}/associar-discord")
 	@ResponseStatus(value = HttpStatus.CREATED)
 	public void associarContaDiscord(@PathVariable String username, @PathVariable String discordId,
-			@RequestParam String token) {
+			@PathVariable String token) {
 		log.info("[inicia] AssociacaoController - associarContaDiscord");
 		associacaoService.associarUsuario(username, discordId, token);
 		log.info("[finaliza] AssociacaoController - associarContaDiscord");
