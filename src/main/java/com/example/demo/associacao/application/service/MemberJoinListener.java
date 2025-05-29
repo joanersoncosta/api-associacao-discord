@@ -62,7 +62,6 @@ public class MemberJoinListener extends ListenerAdapter {
 //
 //        log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
     }
-
 //	@Override
 //	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 //		log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
