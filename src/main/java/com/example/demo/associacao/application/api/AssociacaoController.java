@@ -31,8 +31,8 @@ public class AssociacaoController {
 		log.info("[finaliza] AssociacaoController - associarContaDiscord");
 	}
 
-	@PostMapping("/{nome}/gerar-link")
-	public String gerarLinkConvite(String nome) {
+	@GetMapping("/{nome}/gerar-link")
+	public String gerarLinkConvite(@PathVariable String nome) {
 		log.info("[inicia] AssociacaoController - gerarLinkConvite");
 		String link = associacaoService.gerarOuObterLinkConvite(nome);
 		log.info("[finaliza] AssociacaoController - gerarLinkConvite");
