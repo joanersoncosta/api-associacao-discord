@@ -23,19 +23,18 @@ import lombok.extern.log4j.Log4j2;
 public class AssociacaoController {
 	private final AssociacaoService associacaoService;
 
-	@PostMapping("/{username}/{discordId}/{token}/associar-discord")
+	@PostMapping("/{username}/associar-discord")
 	@ResponseStatus(value = HttpStatus.CREATED)
-	public void associarContaDiscord(@PathVariable String username, @PathVariable String discordId,
-			@PathVariable String token) {
+	public void associarContaDiscord(@PathVariable String username) {
 		log.info("[inicia] AssociacaoController - associarContaDiscord");
-		associacaoService.associarUsuario(username, discordId, token);
+		associacaoService.associarUsuario(username);
 		log.info("[finaliza] AssociacaoController - associarContaDiscord");
 	}
 
-	@PostMapping("/{nomeUsuario}/gerar-link")
-	public String gerarLinkConvite(@PathVariable String nomeUsuario) {
+	@PostMapping("/{nome}/gerar-link")
+	public String gerarLinkConvite(String nome) {
 		log.info("[inicia] AssociacaoController - gerarLinkConvite");
-		String link = associacaoService.gerarOuObterLinkConvite(nomeUsuario);
+		String link = associacaoService.gerarOuObterLinkConvite(nome);
 		log.info("[finaliza] AssociacaoController - gerarLinkConvite");
 		return link;
 	}

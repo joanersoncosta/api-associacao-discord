@@ -41,8 +41,7 @@ public class AssociacaoDiscord {
 	@Column(name = "associado")
 	private boolean associado;
 
-	public void associar(String idDiscordUser, String nome) {
-		this.discordId = idDiscordUser;
+	public void associar(String nome) {
 		this.nomeUsuario = nome;
 		this.associado = true;
 	}
