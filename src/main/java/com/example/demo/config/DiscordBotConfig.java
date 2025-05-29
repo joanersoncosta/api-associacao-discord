@@ -23,6 +23,7 @@ public class DiscordBotConfig {
     @PostConstruct
     public void startBot() throws Exception {
         log.info("[start] DiscordBotConfig - startBot");
+        log.info("[start] DiscordBotConfig - {}", botToken);
         JDABuilder.createDefault(botToken)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .addEventListeners(memberJoinListener)
