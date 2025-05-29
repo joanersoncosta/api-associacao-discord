@@ -29,7 +29,7 @@ public class MemberJoinListener extends ListenerAdapter {
 
         associacaoService.associarUsuario(username);
         log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
-
+    }
 //        String url = urlInstancia + String.format(
 //            "/api/associacao/%s/%s/%s/associar-discord",
 //            username, discordId, token
@@ -61,7 +61,7 @@ public class MemberJoinListener extends ListenerAdapter {
 //            );
 //
 //        log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
-    }
+
 //	@Override
 //	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
 //		log.info("[inicia] MemberJoinListener - onGuildMemberJoin");

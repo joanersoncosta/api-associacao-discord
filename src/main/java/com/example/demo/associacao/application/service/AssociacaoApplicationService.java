@@ -1,6 +1,7 @@
 package com.example.demo.associacao.application.service;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -25,9 +26,12 @@ public class AssociacaoApplicationService implements AssociacaoService {
 	@Override
 	public String gerarOuObterLinkConvite(String nome) {
 		log.info("[inicia] AssociacaoApplicationService - gerarOuObterLinkConvite");
-		AssociacaoDiscord associacao = repository.findByNomeUsuario(nome).orElseGet(() -> {
-			AssociacaoDiscord nova = new AssociacaoDiscord(nome);
-			return repository.save(nova);
+		AssociacaoDiscord associacao = repository.findByNomeUsuario(nome).orElseGet(new Supplier<AssociacaoDiscord>() {
+			@Override
+			public AssociacaoDiscord get() {
+				AssociacaoDiscord nova = new AssociacaoDiscord(nome);
+				return repository.save(nova);
+			}
 		});
 
 		DiscordConviteRequest conviteRequest = new DiscordConviteRequest(1, true, 0);
