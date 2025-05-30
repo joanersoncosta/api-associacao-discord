@@ -36,7 +36,7 @@ public class MemberJoinListener extends ListenerAdapter {
         User user = member.getUser();
 
         String username = user.getName();
-
+        associarContaDiscord(username);
 //        associacaoService.associarUsuario(username);
         log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
     }
