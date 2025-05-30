@@ -39,7 +39,6 @@ public class AssociacaoApplicationService implements AssociacaoService {
 
 		associacao.editarToken(convite.getCode());
 		repository.save(associacao);
-
 		String url = "https://discord.gg/" + convite.getCode() + "?token=" + associacao.getToken();
 		log.info("[url]: {}", url);
 		log.info("[finaliza] AssociacaoApplicationService - gerarOuObterLinkConvite");
