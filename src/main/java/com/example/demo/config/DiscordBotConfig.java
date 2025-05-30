@@ -16,9 +16,9 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 @RequiredArgsConstructor
 public class DiscordBotConfig {
 
-    @Value("${discord.bot.token}")
-    private String botToken;
-    private final MemberJoinListener memberJoinListener;
+	@Value("${discord.bot.token}")
+	private String botToken;
+	private final MemberJoinListener memberJoinListener;
 
     @PostConstruct
     public void startBot() throws Exception {
@@ -29,4 +29,19 @@ public class DiscordBotConfig {
                 .build();
         log.debug("[finish] DiscordBotConfig - startBot");
     }
+    
+//	@PostConstruct
+//	public void startBot() {
+//		log.info("[start] DiscordBotConfig - startBot");
+//		JDABuilder.createDefault(botToken)
+//	    .enableIntents(GatewayIntent.GUILD_MEMBERS)
+//	    .addEventListeners(memberJoinListener)
+//	    .addEventListeners(new ListenerAdapter() {
+//	        @Override
+//	        public void onReady(ReadyEvent event) {
+//	            log.info("JDA iniciado com sucesso");
+//	        }
+//	    })
+//	    .build();
+//	}
 }
