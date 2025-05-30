@@ -29,7 +29,6 @@ public class DiscordBotConfig {
                 .build();
         log.debug("[finish] DiscordBotConfig - startBot");
     }
-    
 //	@PostConstruct
 //	public void startBot() {
 //		log.info("[start] DiscordBotConfig - startBot");
