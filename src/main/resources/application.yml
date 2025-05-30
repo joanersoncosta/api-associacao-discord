@@ -29,7 +29,7 @@ discord:
   channel:
     id: ${ID_CHANNEL_DISCORD:123456}
   bot:
-    token: ${DISCORD_TOKEN:MMMMM123456}
+    token: ${DISCORD_TOKEN:Bot 1234567}
 
 aws:
   url: ${AWS_URL:http://localhost:8080}
