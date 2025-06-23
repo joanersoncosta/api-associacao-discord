@@ -27,7 +27,7 @@ public class AssociacaoController {
 	@ResponseStatus(value = HttpStatus.OK)
 	public void associarContaDiscord(@PathVariable String username) {
 		log.info("[inicia] AssociacaoController - associarContaDiscord");
-		associacaoService.associarUsuario(username);
+//		associacaoService.associarUsuario(username);
 		log.info("[finaliza] AssociacaoController - associarContaDiscord");
 	}
 

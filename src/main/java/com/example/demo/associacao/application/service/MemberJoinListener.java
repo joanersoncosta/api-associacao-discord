@@ -18,72 +18,22 @@ import reactor.core.publisher.Mono;
 @Component
 @RequiredArgsConstructor
 public class MemberJoinListener extends ListenerAdapter {
-//    private final AssociacaoService associacaoService;
+    private final AssociacaoService associacaoService;
 	@Value("${aws.url}")
 	private String urlInstancia;
-    private WebClient webClient;
 
-    @Autowired
-    public MemberJoinListener(WebClient.Builder webClientBuilder) {
-		this.webClient = webClientBuilder.build();
-    }
-    
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
-
         Member member = event.getMember();
         User user = member.getUser();
-
+		String discordId = user.getId();
         String username = user.getName();
-        associarContaDiscord(username);
-//        associacaoService.associarUsuario(username);
+        log.info("[Nome] {}, [IdDiscord] {}", username, discordId);
+        associacaoService.associarUsuario(username, discordId);
         log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
     }
     
-	public void associarContaDiscord(String username) {
-		String uri = String.format(urlInstancia + "/api/associacao/%s/associar-discord", username);
-		try {
-			String response = webClient.patch()
-					.uri(uri).retrieve()
-					.onStatus(status -> 
-						status.isError(),
-							clientResponse -> Mono.error(new RuntimeException("Erro HTTP: " + clientResponse.statusCode())))
-					.bodyToMono(String.class).block();
-			log.info("✅ Associação feita com sucesso: {}", response);
-
-		} catch (WebClientResponseException e) {
-			String errorMessage = e.getResponseBodyAsString();
-			log.error("❌ Erro HTTP ao associar conta Discord: {}", errorMessage);
-			throw new RuntimeException("Erro ao associar conta: " + e.getMessage(), e);
-
-		} catch (Exception e) {
-			log.error("❌ Erro inesperado ao associar conta Discord: {}", e.getMessage());
-			throw new RuntimeException("Erro inesperado ao associar conta.", e);
-		}
-	}
-//        String url = urlInstancia + String.format(
-//            "/api/associacao/%s/%s/%s/associar-discord",
-//            username, discordId, token
-//        );
-//
-//        try {
-//            HttpClient client = HttpClient.newHttpClient();
-//            HttpRequest request = HttpRequest.newBuilder()
-//                .uri(URI.create(url))
-//                .POST(HttpRequest.BodyPublishers.noBody())
-//                .build();
-//
-//            client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-//                .thenAccept(response -> log.info("Resposta da API: {}", response.body()))
-//                .exceptionally(ex -> {
-//                    log.error("Erro ao chamar API: {}", ex.getMessage());
-//                    return null;
-//                });
-//        } catch (Exception e) {
-//            log.error("Erro ao montar requisição HTTP", e);
-//        }
-//
 //        String mensagem = "Olá " + username + "! 👋\nClique aqui para associar sua conta: " + url;
 //        user.openPrivateChannel()
 //            .flatMap(channel -> channel.sendMessage(mensagem))

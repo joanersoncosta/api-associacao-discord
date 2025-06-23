@@ -47,11 +47,18 @@ public class AssociacaoApplicationService implements AssociacaoService {
 	}
 
 	@Override
-	public void associarUsuario(String username) {
+	public void associarUsuario(String username, String idDiscord) {
 		log.info("[inicia] AssociacaoApplicationService - associarUsuario");
-		AssociacaoDiscord associacao = repository.findByNomeUsuario(username)
-				.orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Usuario não encontrado"));
+		AssociacaoDiscord associacao = repository.findByNomeUsuario(username).orElseGet(new Supplier<AssociacaoDiscord>() {
+			@Override
+			public AssociacaoDiscord get() {
+				AssociacaoDiscord nova = new AssociacaoDiscord(username);
+				return repository.save(nova);
+			}
+		});
 		associacao.validaSeJaFoiAssociado();
+		associacao.associar(idDiscord);
+		repository.save(associacao);
 		log.info("[finaliza] AssociacaoApplicationService - associarUsuario");
 	}
 
