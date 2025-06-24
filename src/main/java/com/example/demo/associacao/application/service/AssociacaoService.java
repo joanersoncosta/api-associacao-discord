@@ -9,4 +9,5 @@ public interface AssociacaoService {
 	String gerarOuObterLinkConvite(String nome);
 	AssociacaoDiscord buscaPorToken(String token);
 	List<AssociacaoDiscord> lista();
+	void deleteAll();
 }

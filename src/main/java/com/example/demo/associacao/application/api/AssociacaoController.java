@@ -48,4 +48,10 @@ public class AssociacaoController {
 	public List<AssociacaoDiscord> lista() {
 		return associacaoService.lista();
 	}
+	
+	@GetMapping("/delete")
+	public String deleteAll() {
+		associacaoService.deleteAll();
+		return "Dados Deletas com sucesso";
+	}
 }

@@ -75,4 +75,11 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		return repository.findAll();
 	}
 
+	@Override
+	public void deleteAll() {
+		log.info("[inicia] AssociacaoApplicationService - deleteAll");
+		repository.deleteAll();
+		log.info("[finaliza] AssociacaoApplicationService - deleteAll");
+	}
+
 }
