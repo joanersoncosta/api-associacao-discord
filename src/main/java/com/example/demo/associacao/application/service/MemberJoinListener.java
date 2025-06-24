@@ -62,7 +62,7 @@ public class MemberJoinListener extends ListenerAdapter {
 
 	private String retornaUrl(String username, String idDiscord) {
 		String url = urlInstancia
-				+ String.format("/api/associacao/%s/%s/SEU-TOKEN-AQUIO/associar-discord", username, idDiscord);
+				+ String.format("/api/associacao/%s/%s/SEU-TOKEN-AQUI/associar-discord", username, idDiscord);
 		return url;
 	}
 
