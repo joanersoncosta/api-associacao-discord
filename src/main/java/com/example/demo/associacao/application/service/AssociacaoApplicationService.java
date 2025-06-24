@@ -28,7 +28,6 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		log.info("[inicia] AssociacaoApplicationService - gerarOuObterLinkConvite");
 		DiscordConviteRequest conviteRequest = new DiscordConviteRequest(1, true, 0);
 		DiscordConviteResponse convite = discordClient.criaConviteDoCanalParaWakander(conviteRequest);
-		repository.save(new AssociacaoDiscord(convite.getCode()));
 		String url = "https://discord.gg/" + convite.getCode();
 		repository.save(new AssociacaoDiscord(convite.getCode()));
 		log.info("[url]: {}", url);

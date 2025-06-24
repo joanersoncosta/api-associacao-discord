@@ -1,0 +1,2 @@
+ALTER TABLE associacao_discord
+DROP CONSTRAINT IF EXISTS associacao_discord_nome_usuario_key;
