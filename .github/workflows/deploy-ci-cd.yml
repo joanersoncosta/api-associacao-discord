@@ -3,7 +3,7 @@ name: continuous-integration with Github Actions
 on:
   push:
     branches: 
-      - envia-url-canal-discord
+      - master
 
 jobs:
   build:
