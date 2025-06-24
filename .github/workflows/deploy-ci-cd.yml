@@ -1,4 +1,4 @@
-name: continuous-integration with Github Actions V2
+name: continuous-integration with Github Actions V3
 
 on:
   push:
