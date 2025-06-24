@@ -10,4 +10,5 @@ public interface AssociacaoService {
 	AssociacaoDiscord buscaPorToken(String token);
 	List<AssociacaoDiscord> lista();
 	void deleteAll();
+	void desassociar(String token);
 }

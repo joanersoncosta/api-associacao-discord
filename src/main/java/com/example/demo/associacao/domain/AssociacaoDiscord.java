@@ -43,6 +43,7 @@ public class AssociacaoDiscord {
 
 	public void associar(String nome, String idDiscord) {
 		this.nomeUsuario = nome;
+		this.discordId = idDiscord;
 		this.associado = true;
 	}
 
@@ -55,6 +56,10 @@ public class AssociacaoDiscord {
 		if (associado == true) {
 			throw APIException.build(HttpStatus.NOT_FOUND, "Usuario já foi associado!");
 		}
+	}
+
+	public void desassociar() {
+		this.associado = false;
 	}
 
 }

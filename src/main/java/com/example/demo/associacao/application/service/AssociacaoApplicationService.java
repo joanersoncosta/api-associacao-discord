@@ -21,7 +21,7 @@ import lombok.extern.log4j.Log4j2;
 public class AssociacaoApplicationService implements AssociacaoService {
 	private final AssociacaoDiscordRepository repository;
 	private final DiscordClient discordClient;
-	private final MemberJoinListener memberJoinListener;
+	private final DiscordService discordService;
 	
 	@Override
 	public String gerarOuObterLinkConvite() {
@@ -32,7 +32,7 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		String url = "https://discord.gg/" + convite.getCode();
 		log.info("[url]: {}", url);
 		log.info("[finaliza] AssociacaoApplicationService - gerarOuObterLinkConvite");
-		return convite.getCode();
+		return url;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		associacao.validaSeJaFoiAssociado();
 		associacao.associar(username, idDiscord);
 		repository.save(associacao);
-		memberJoinListener.atualizaCargoParaWakander(idDiscord);
+		discordService.atualizaCargoParaWakander(idDiscord);
 		log.info("[finaliza] AssociacaoApplicationService - associarUsuario");
 	}
 
@@ -65,6 +65,13 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		log.info("[inicia] AssociacaoApplicationService - deleteAll");
 		repository.deleteAll();
 		log.info("[finaliza] AssociacaoApplicationService - deleteAll");
+	}
+
+	@Override
+	public void desassociar(String token) {
+		AssociacaoDiscord associacao = buscaPorToken(token);
+		associacao.desassociar();
+		repository.save(associacao);
 	}
 
 }
