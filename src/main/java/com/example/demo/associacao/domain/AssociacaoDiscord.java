@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 
-import com.example.demo.associacao.handler.APIException;
+import com.example.demo.handler.APIException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,17 +41,14 @@ public class AssociacaoDiscord {
 	@Column(name = "associado")
 	private boolean associado;
 
-	public void associar(String nome) {
+	public void associar(String nome, String idDiscord) {
 		this.nomeUsuario = nome;
+		this.discordId = idDiscord;
 		this.associado = true;
 	}
 
-	public void editarToken(String token) {
+	public AssociacaoDiscord(String token) {
 		this.token = token;
-	}
-
-	public AssociacaoDiscord(String nome) {
-		this.nomeUsuario = nome;
 		this.associado = false;
 	}
 
@@ -59,6 +56,10 @@ public class AssociacaoDiscord {
 		if (associado == true) {
 			throw APIException.build(HttpStatus.NOT_FOUND, "Usuario já foi associado!");
 		}
+	}
+
+	public void desassociar() {
+		this.associado = false;
 	}
 
 }

@@ -1,4 +1,4 @@
-package com.example.demo.associacao.comunicacao;
+package com.example.demo.comunicacao.infra;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -1,112 +1,81 @@
 package com.example.demo.associacao.application.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+import com.example.demo.handler.APIException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import reactor.core.publisher.Mono;
 
 @Log4j2
 @Component
 @RequiredArgsConstructor
 public class MemberJoinListener extends ListenerAdapter {
-//    private final AssociacaoService associacaoService;
 	@Value("${aws.url}")
 	private String urlInstancia;
-    private WebClient webClient;
+	private static final String ID_CANAL_ONBOARDING = "1374404661670318143";
+	private static final String ID_CARGO_ONBOARDING = "1387064641410044076";
 
-    @Autowired
-    public MemberJoinListener(WebClient.Builder webClientBuilder) {
-		this.webClient = webClientBuilder.build();
-    }
-    
-    @Override
-    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-        log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
+	@Override
+	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+		log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
+		atribuiCargoOnboarding(event);
+		publicaMensagem(event);
+		log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
+	}
 
-        Member member = event.getMember();
-        User user = member.getUser();
+	private void atribuiCargoOnboarding(GuildMemberJoinEvent event) {
+		log.info("[inicia] MemberJoinListener - atribuiCargoOnboarding");
+		atribuirNovoCargo(event, ID_CARGO_ONBOARDING);
+	}
 
-        String username = user.getName();
-        associarContaDiscord(username);
-//        associacaoService.associarUsuario(username);
-        log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
-    }
-    
-	public void associarContaDiscord(String username) {
-		String uri = String.format(urlInstancia + "/api/associacao/%s/associar-discord", username);
-		try {
-			String response = webClient.patch()
-					.uri(uri).retrieve()
-					.onStatus(status -> 
-						status.isError(),
-							clientResponse -> Mono.error(new RuntimeException("Erro HTTP: " + clientResponse.statusCode())))
-					.bodyToMono(String.class).block();
-			log.info("✅ Associação feita com sucesso: {}", response);
+	private void atribuirNovoCargo(GuildMemberJoinEvent event, String cargo) {
+		log.info("[inicia] MemberJoinListener - atribuirNovoCargo");
+		Guild guild = event.getGuild();
+		Member member = event.getMember();
+		Role onboardingRole = guild.getRoleById(cargo);
+		validaRole(member, onboardingRole);
+		guild.addRoleToMember(member, onboardingRole).queue();
+	}
 
-		} catch (WebClientResponseException e) {
-			String errorMessage = e.getResponseBodyAsString();
-			log.error("❌ Erro HTTP ao associar conta Discord: {}", errorMessage);
-			throw new RuntimeException("Erro ao associar conta: " + e.getMessage(), e);
+	private void publicaMensagem(GuildMemberJoinEvent event) {
+		log.info("[inicia] MemberJoinListener - publicaMensagem");
+		Member member = event.getMember();
+		User user = member.getUser();
+		Guild guild = event.getGuild();
+		validaGuild(guild);
+		TextChannel onboardingChannel = guild.getTextChannelById(ID_CANAL_ONBOARDING);
+		String url = retornaUrl(user.getName(), member.getId());
+		onboardingChannel.sendMessage(member.getAsMention()
+				+ ", Seja bem-vindo a Guild Wakanda!👋 \nClique no link a baixo e adicione o token que foi enviado no seu whatsapp, para validar sua entrada e liberar os módulos: \n\n"
+				+ url).queue();
+	}
 
-		} catch (Exception e) {
-			log.error("❌ Erro inesperado ao associar conta Discord: {}", e.getMessage());
-			throw new RuntimeException("Erro inesperado ao associar conta.", e);
+	private String retornaUrl(String username, String idDiscord) {
+		String url = urlInstancia
+				+ String.format("/api/associacao/%s/%s/SEU-TOKEN-AQUIO/associar-discord", username, idDiscord);
+		return url;
+	}
+
+	private void validaRole(Member member, Role roleWakander) {
+		if (member == null || roleWakander == null) {
+			throw APIException.build(HttpStatus.NOT_FOUND, "Membro ou cargo não encontrado!");
 		}
 	}
-//        String url = urlInstancia + String.format(
-//            "/api/associacao/%s/%s/%s/associar-discord",
-//            username, discordId, token
-//        );
-//
-//        try {
-//            HttpClient client = HttpClient.newHttpClient();
-//            HttpRequest request = HttpRequest.newBuilder()
-//                .uri(URI.create(url))
-//                .POST(HttpRequest.BodyPublishers.noBody())
-//                .build();
-//
-//            client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-//                .thenAccept(response -> log.info("Resposta da API: {}", response.body()))
-//                .exceptionally(ex -> {
-//                    log.error("Erro ao chamar API: {}", ex.getMessage());
-//                    return null;
-//                });
-//        } catch (Exception e) {
-//            log.error("Erro ao montar requisição HTTP", e);
-//        }
-//
-//        String mensagem = "Olá " + username + "! 👋\nClique aqui para associar sua conta: " + url;
-//        user.openPrivateChannel()
-//            .flatMap(channel -> channel.sendMessage(mensagem))
-//            .queue(
-//                success -> log.info("Mensagem enviada para {}", username),
-//                error -> log.warn("Erro ao enviar DM para {}: {}", username, error.getMessage())
-//            );
-//
-//        log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
 
-//	@Override
-//	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-//		log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
-//		Member member = event.getMember();
-//		User user = member.getUser();
-//
-//		String username = user.getName();
-//		String discordId = user.getId();
-//
-//		String token = associacaoService.gerarOuObterLinkConvite(username);
-//		associacaoService.associarUsuario(username, discordId, token);
-////		client.associarContaDiscord(username, discordId, token);
-//		log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
-//	}
+	private void validaGuild(Guild guild) {
+		if (guild == null) {
+			throw APIException.build(HttpStatus.NOT_FOUND, "Servidor não encontrado!");
+		}
+	}
 
 }

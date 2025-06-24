@@ -5,8 +5,10 @@ import java.util.List;
 import com.example.demo.associacao.domain.AssociacaoDiscord;
 
 public interface AssociacaoService {
-	void associarUsuario(String nome);
-	String gerarOuObterLinkConvite(String nome);
+	void associarUsuario(String nome, String IdDiscord, String token);
+	String gerarOuObterLinkConvite();
 	AssociacaoDiscord buscaPorToken(String token);
 	List<AssociacaoDiscord> lista();
+	void deleteAll();
+	void desassociar(String token);
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -23,18 +22,18 @@ import lombok.extern.log4j.Log4j2;
 public class AssociacaoController {
 	private final AssociacaoService associacaoService;
 
-	@PatchMapping("/{username}/associar-discord")
+	@GetMapping("/{username}/{idDiscord}/{token}/associar-discord")
 	@ResponseStatus(value = HttpStatus.OK)
-	public void associarContaDiscord(@PathVariable String username) {
+	public void associarContaDiscord(@PathVariable String username, @PathVariable String idDiscord, @PathVariable String token) {
 		log.info("[inicia] AssociacaoController - associarContaDiscord");
-		associacaoService.associarUsuario(username);
+		associacaoService.associarUsuario(username, idDiscord, token);
 		log.info("[finaliza] AssociacaoController - associarContaDiscord");
 	}
 
-	@GetMapping("/{nome}/gerar-link")
-	public String gerarLinkConvite(@PathVariable String nome) {
+	@GetMapping("/gerar-link")
+	public String gerarLinkConvite() {
 		log.info("[inicia] AssociacaoController - gerarLinkConvite");
-		String link = associacaoService.gerarOuObterLinkConvite(nome);
+		String link = associacaoService.gerarOuObterLinkConvite();
 		log.info("[finaliza] AssociacaoController - gerarLinkConvite");
 		return link;
 	}
@@ -47,5 +46,17 @@ public class AssociacaoController {
 	@GetMapping("/")
 	public List<AssociacaoDiscord> lista() {
 		return associacaoService.lista();
+	}
+	
+	@GetMapping("/delete")
+	public String deleteAll() {
+		associacaoService.deleteAll();
+		return "Dados Deletas com sucesso";
+	}
+	
+	@GetMapping("/{token}/desassociar")
+	public String desassociar(@PathVariable String token) {
+		associacaoService.desassociar(token);
+		return "Desassociar usuario";
 	}
 }

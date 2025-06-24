@@ -1,17 +1,16 @@
 package com.example.demo.associacao.application.service;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import com.example.demo.associacao.comunicacao.DiscordClient;
-import com.example.demo.associacao.comunicacao.DiscordConviteRequest;
-import com.example.demo.associacao.comunicacao.DiscordConviteResponse;
 import com.example.demo.associacao.domain.AssociacaoDiscord;
-import com.example.demo.associacao.handler.APIException;
 import com.example.demo.associacao.infra.AssociacaoDiscordRepository;
+import com.example.demo.comunicacao.infra.DiscordClient;
+import com.example.demo.comunicacao.infra.DiscordConviteRequest;
+import com.example.demo.comunicacao.infra.DiscordConviteResponse;
+import com.example.demo.handler.APIException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,35 +21,30 @@ import lombok.extern.log4j.Log4j2;
 public class AssociacaoApplicationService implements AssociacaoService {
 	private final AssociacaoDiscordRepository repository;
 	private final DiscordClient discordClient;
-
+	private final DiscordService discordService;
+	
 	@Override
-	public String gerarOuObterLinkConvite(String nome) {
+	public String gerarOuObterLinkConvite() {
 		log.info("[inicia] AssociacaoApplicationService - gerarOuObterLinkConvite");
-		AssociacaoDiscord associacao = repository.findByNomeUsuario(nome).orElseGet(new Supplier<AssociacaoDiscord>() {
-			@Override
-			public AssociacaoDiscord get() {
-				AssociacaoDiscord nova = new AssociacaoDiscord(nome);
-				return repository.save(nova);
-			}
-		});
-
 		DiscordConviteRequest conviteRequest = new DiscordConviteRequest(1, true, 0);
 		DiscordConviteResponse convite = discordClient.criaConviteDoCanalParaWakander(conviteRequest);
-
-		associacao.editarToken(convite.getCode());
-		repository.save(associacao);
-		String url = "https://discord.gg/" + convite.getCode() + "?token=" + associacao.getToken();
+		repository.save(new AssociacaoDiscord(convite.getCode()));
+		String url = "https://discord.gg/" + convite.getCode();
+		repository.save(new AssociacaoDiscord(convite.getCode()));
 		log.info("[url]: {}", url);
 		log.info("[finaliza] AssociacaoApplicationService - gerarOuObterLinkConvite");
-		return convite.getCode();
+		return url;
 	}
 
 	@Override
-	public void associarUsuario(String username) {
+	public void associarUsuario(String username, String idDiscord, String token) {
 		log.info("[inicia] AssociacaoApplicationService - associarUsuario");
-		AssociacaoDiscord associacao = repository.findByNomeUsuario(username)
-				.orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Usuario não encontrado"));
+		AssociacaoDiscord associacao = repository.findByToken(token)
+				.orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Usuario não encontrado!"));
 		associacao.validaSeJaFoiAssociado();
+		associacao.associar(username, idDiscord);
+		repository.save(associacao);
+		discordService.atualizaCargoParaWakander(idDiscord);
 		log.info("[finaliza] AssociacaoApplicationService - associarUsuario");
 	}
 
@@ -65,6 +59,20 @@ public class AssociacaoApplicationService implements AssociacaoService {
 	@Override
 	public List<AssociacaoDiscord> lista() {
 		return repository.findAll();
+	}
+
+	@Override
+	public void deleteAll() {
+		log.info("[inicia] AssociacaoApplicationService - deleteAll");
+		repository.deleteAll();
+		log.info("[finaliza] AssociacaoApplicationService - deleteAll");
+	}
+
+	@Override
+	public void desassociar(String token) {
+		AssociacaoDiscord associacao = buscaPorToken(token);
+		associacao.desassociar();
+		repository.save(associacao);
 	}
 
 }
