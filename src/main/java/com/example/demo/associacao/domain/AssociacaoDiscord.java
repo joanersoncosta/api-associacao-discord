@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import org.springframework.http.HttpStatus;
 
-import com.example.demo.associacao.handler.APIException;
+import com.example.demo.handler.APIException;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -41,17 +41,13 @@ public class AssociacaoDiscord {
 	@Column(name = "associado")
 	private boolean associado;
 
-	public void associar(String nome) {
+	public void associar(String nome, String idDiscord) {
 		this.nomeUsuario = nome;
 		this.associado = true;
 	}
 
-	public void editarToken(String token) {
+	public AssociacaoDiscord(String token) {
 		this.token = token;
-	}
-
-	public AssociacaoDiscord(String nome) {
-		this.nomeUsuario = nome;
 		this.associado = false;
 	}
 

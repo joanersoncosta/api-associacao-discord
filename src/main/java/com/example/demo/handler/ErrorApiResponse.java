@@ -1,4 +1,4 @@
-package com.example.demo.associacao.handler;
+package com.example.demo.handler;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
