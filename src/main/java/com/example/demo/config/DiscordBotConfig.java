@@ -27,6 +27,7 @@ public class DiscordBotConfig {
         log.info("[start] Iniciando o JDA...");
         JDA jda = JDABuilder.createDefault(botToken)
                 .enableIntents(GatewayIntent.GUILD_MEMBERS, GatewayIntent.GUILD_MESSAGES)
+                .addEventListeners(memberJoinListener)
                 .addEventListeners(new ListenerAdapter() {
                     @Override
                     public void onReady(ReadyEvent event) {
