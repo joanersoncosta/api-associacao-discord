@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -20,62 +21,86 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 @Component
 @RequiredArgsConstructor
 public class MemberJoinListener extends ListenerAdapter {
-	@Value("${aws.url}")
-	private String urlInstancia;
-	private static final String ID_CANAL_ONBOARDING = "1374404661670318143";
-	private static final String ID_CARGO_ONBOARDING = "1387064641410044076";
+    @Value("${aws.url}")
+    private String urlInstancia;
+    private static final String ID_BOT = "1374448871836745853";
+    private static final String ID_CANAL_ONBOARDING = "1374404661670318143";
+    private static final String ID_CARGO_ONBOARDING = "1387064641410044076";
 
-	@Override
-	public void onGuildMemberJoin(GuildMemberJoinEvent event) {
-		log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
-		atribuiCargoOnboarding(event);
-		publicaMensagem(event);
-		log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
-	}
+    @Override
+    public void onGuildMemberJoin(GuildMemberJoinEvent event) {
+        log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
+        atribuiCargoInicial(event);
+        enviaMensagemDeBoasVindas(event);
+        log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
+    }
 
-	private void atribuiCargoOnboarding(GuildMemberJoinEvent event) {
-		log.info("[inicia] MemberJoinListener - atribuiCargoOnboarding");
-		atribuirNovoCargo(event, ID_CARGO_ONBOARDING);
-	}
+    private void atribuiCargoInicial(GuildMemberJoinEvent event) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Role roleOnboarding = guild.getRoleById(ID_CARGO_ONBOARDING);
 
-	private void atribuirNovoCargo(GuildMemberJoinEvent event, String cargo) {
-		log.info("[inicia] MemberJoinListener - atribuirNovoCargo");
-		Guild guild = event.getGuild();
-		Member member = event.getMember();
-		Role onboardingRole = guild.getRoleById(cargo);
-		validaRole(member, onboardingRole);
-		guild.addRoleToMember(member, onboardingRole).queue();
-	}
+        validarMembroECargo(member, roleOnboarding);
+        adicionarCargo(member, roleOnboarding);
+    }
 
-	private void publicaMensagem(GuildMemberJoinEvent event) {
-		log.info("[inicia] MemberJoinListener - publicaMensagem");
-		Member member = event.getMember();
-		User user = member.getUser();
-		Guild guild = event.getGuild();
-		validaGuild(guild);
-		TextChannel onboardingChannel = guild.getTextChannelById(ID_CANAL_ONBOARDING);
-		String url = retornaUrl(user.getName(), member.getId());
-		onboardingChannel.sendMessage(member.getAsMention()
-				+ ", Seja bem-vindo a Guild Wakanda!👋 \nClique no link a baixo e adicione o token que foi enviado no seu whatsapp, para validar sua entrada e liberar os módulos: \n\n"
-				+ url).queue();
-	}
+    private void enviaMensagemDeBoasVindas(GuildMemberJoinEvent event) {
+        Member member = event.getMember();
+        User user = member.getUser();
+        Guild guild = event.getGuild();
 
-	private String retornaUrl(String username, String idDiscord) {
-		String url = urlInstancia
-				+ String.format("/api/associacao/%s/%s/SEU-TOKEN-AQUIO/associar-discord", username, idDiscord);
-		return url;
-	}
+        validarGuild(guild);
+        String url = gerarUrlValidacao(user.getName(), member.getId());
 
-	private void validaRole(Member member, Role roleWakander) {
-		if (member == null || roleWakander == null) {
-			throw APIException.build(HttpStatus.NOT_FOUND, "Membro ou cargo não encontrado!");
-		}
-	}
+        enviarMensagemPrivadaOuFallback(member, user, guild, url);
+    }
 
-	private void validaGuild(Guild guild) {
-		if (guild == null) {
-			throw APIException.build(HttpStatus.NOT_FOUND, "Servidor não encontrado!");
-		}
-	}
+    private void adicionarCargo(Member member, Role cargo) {
+        member.getGuild().addRoleToMember(member, cargo).queue();
+    }
 
+    private void enviarMensagemPrivadaOuFallback(Member member, User user, Guild guild, String url) {
+        TextChannel canalOnboarding = guild.getTextChannelById(ID_CANAL_ONBOARDING);
+
+        user.openPrivateChannel().queue(
+            privateChannel -> enviarMensagemPrivada(privateChannel, user, url, member, canalOnboarding),
+            failure -> notificarFalhaNaDM(member, url, canalOnboarding)
+        );
+    }
+
+    private void enviarMensagemPrivada(PrivateChannel channel, User user, String url, Member member, TextChannel canalOnboarding) {
+        String mensagemPrivada = String.format(
+                "👋 Olá %s!\n\nClique no link abaixo e adicione o token que foi enviado no seu WhatsApp para validar sua entrada e liberar os módulos:\n\n%s",
+                user.getName(), url);
+        channel.sendMessage(mensagemPrivada).queue();
+
+        canalOnboarding.sendMessage(String.format("%s, Seja bem-vindo à Guild Wakanda!👋 \n" +
+                "Foi enviada uma mensagem no seu privado para validar sua entrada.\n" +
+                "Caso não encontre, acesse: https://discord.com/channels/@me/%s", member.getAsMention(), ID_BOT))
+                .queue();
+    }
+
+    private void notificarFalhaNaDM(Member member, String url, TextChannel canalOnboarding) {
+        canalOnboarding.sendMessage(String.format(
+                "%s, Seja bem-vindo à Guild Wakanda!👋 \n" +
+                "❌ Não conseguimos mandar a URL de validação no seu privado.\n\n" +
+                "👉 Clique no link abaixo e adicione o token Discord que foi enviado no seu WhatsApp para validar sua entrada e liberar os módulos:\n\n%s",
+                member.getAsMention(), url)).queue();
+    }
+
+    private String gerarUrlValidacao(String username, String idDiscord) {
+        return String.format("%s/api/associacao/%s/%s/SEU-TOKEN-AQUI/associar-discord", urlInstancia, username, idDiscord);
+    }
+
+    private void validarMembroECargo(Member member, Role role) {
+        if (member == null || role == null) {
+            throw APIException.build(HttpStatus.NOT_FOUND, "Membro ou cargo não encontrado!");
+        }
+    }
+
+    private void validarGuild(Guild guild) {
+        if (guild == null) {
+            throw APIException.build(HttpStatus.NOT_FOUND, "Servidor não encontrado!");
+        }
+    }
 }
