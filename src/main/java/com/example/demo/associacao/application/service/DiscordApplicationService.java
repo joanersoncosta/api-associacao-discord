@@ -20,7 +20,7 @@ public class DiscordApplicationService implements DiscordService {
 	private final JDA jda;
 	private static final String ID_GUILD = "1374404660906950718";
 	private static final String ID_CANAL_ONBOARDING = "1374404661670318143";
-	private static final String ID_CARGO_DEFAULT = "1374404660906950718";
+	private static final String ID_CARGO_DEFAULT = "1387064641410044076";
 	private static final String ID_CARGO_WAKANDER = "1387069524679065750";
 
 	public void atualizaCargoParaWakander(String idDiscord) {
