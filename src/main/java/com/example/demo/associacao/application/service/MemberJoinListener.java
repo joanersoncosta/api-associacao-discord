@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -24,24 +25,24 @@ public class MemberJoinListener extends ListenerAdapter {
     private String urlInstancia;
     private static final String ID_BOT = "1374448871836745853";
     private static final String ID_CANAL_ONBOARDING = "1374404661670318143";
-//    private static final String ID_CARGO_ONBOARDING = "1387064641410044076";
+    private static final String ID_CARGO_ONBOARDING = "1387064641410044076";
 
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
-//        atribuiCargoInicial(event);
+        atribuiCargoInicial(event);
         enviaMensagemDeBoasVindas(event);
         log.info("[finaliza] MemberJoinListener - onGuildMemberJoin");
     }
 
-//    private void atribuiCargoInicial(GuildMemberJoinEvent event) {
-//        Guild guild = event.getGuild();
-//        Member member = event.getMember();
-//        Role roleOnboarding = guild.getRoleById(ID_CARGO_ONBOARDING);
-//
-//        validarMembroECargo(member, roleOnboarding);
-//        adicionarCargo(member, roleOnboarding);
-//    }
+    private void atribuiCargoInicial(GuildMemberJoinEvent event) {
+        Guild guild = event.getGuild();
+        Member member = event.getMember();
+        Role roleOnboarding = guild.getRoleById(ID_CARGO_ONBOARDING);
+
+        validarMembroECargo(member, roleOnboarding);
+        adicionarCargo(member, roleOnboarding);
+    }
 
     private void enviaMensagemDeBoasVindas(GuildMemberJoinEvent event) {
         Member member = event.getMember();
@@ -54,9 +55,9 @@ public class MemberJoinListener extends ListenerAdapter {
         enviarMensagemPrivadaOuFallback(member, user, guild, url);
     }
 
-//    private void adicionarCargo(Member member, Role cargo) {
-//        member.getGuild().addRoleToMember(member, cargo).queue();
-//    }
+    private void adicionarCargo(Member member, Role cargo) {
+        member.getGuild().addRoleToMember(member, cargo).queue();
+    }
 
     private void enviarMensagemPrivadaOuFallback(Member member, User user, Guild guild, String url) {
         TextChannel canalOnboarding = guild.getTextChannelById(ID_CANAL_ONBOARDING);
@@ -91,11 +92,11 @@ public class MemberJoinListener extends ListenerAdapter {
         return String.format("%s/api/associacao/%s/%s/SEU-TOKEN-AQUI/associar-discord", urlInstancia, username, idDiscord);
     }
 
-//    private void validarMembroECargo(Member member, Role role) {
-//        if (member == null || role == null) {
-//            throw APIException.build(HttpStatus.NOT_FOUND, "Membro ou cargo não encontrado!");
-//        }
-//    }
+    private void validarMembroECargo(Member member, Role role) {
+        if (member == null || role == null) {
+            throw APIException.build(HttpStatus.NOT_FOUND, "Membro ou cargo não encontrado!");
+        }
+    }
 
     private void validarGuild(Guild guild) {
         if (guild == null) {
