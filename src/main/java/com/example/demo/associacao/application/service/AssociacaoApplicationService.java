@@ -32,7 +32,7 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		repository.save(new AssociacaoDiscord(convite.getCode()));
 		log.info("[url]: {}", url);
 		log.info("[finaliza] AssociacaoApplicationService - gerarOuObterLinkConvite");
-		return "URL: " + url + "\nToken: " + convite.getCode();
+		return "URL:   " + url + "         -         Token:   " + convite.getCode();
 	}
 
 	@Override
