@@ -4,30 +4,34 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Associação de Discord</title>
-
-  <!-- Link correto com Thymeleaf -->
   <link rel="stylesheet" th:href="@{/css/formulariotokendiscord.css}" />
 </head>
 <body>
-  <div class="container">
-    <form id="discordForm" method="post" th:action="@{/validar-token}">
+  <div class="wrapper">
+    <div class="corner-bar"></div>
+
+    <div class="container">
       <h1>Associação de Discord</h1>
       <p>Insira o token fornecido para completar a associação</p>
 
-      <div class="input-group">
-        <label for="token">Token:</label>
-        <input type="text" id="token" name="token" placeholder="Seu token" required />
-      </div>
+      <form id="discordForm">
+        <div class="input-group">
+          <label for="token">Token:</label>
+          <input type="text" id="token" name="token" placeholder="Seu token" required />
+        </div>
 
-      <!-- Exibição de mensagens -->
-      <div th:if="${mensagemErro}" class="error-message" th:text="${mensagemErro}"></div>
-      <div th:if="${mensagemSucesso}" class="success-message" th:text="${mensagemSucesso}"></div>
+        <div id="mensagemErro" class="error-message-container" style="display: none;">
+          <span class="icon">⚠️</span>
+          <span id="erroTexto"></span>
+        </div>
 
-      <button type="submit">Validar</button>
-    </form>
+        <div id="mensagemSucesso" class="success-message" style="display: none;"></div>
+
+        <button type="submit">VALIDAR</button>
+      </form>
+    </div>
   </div>
 
-  <!-- Script com caminho correto -->
   <script th:src="@{/js/formulariotokendiscord.js}"></script>
 </body>
 </html>

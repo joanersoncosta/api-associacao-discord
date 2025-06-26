@@ -1,15 +1,14 @@
-package com.example.demo.formulario.application.api;
+package com.example.demo.associacao.application.api;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Data
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DiscordRequest {
-	private String nome;
-	private String idDiscord; 
+public class TokenResponse {
+	private String link;
 	private String token;
 }

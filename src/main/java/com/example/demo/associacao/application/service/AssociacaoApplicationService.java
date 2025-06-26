@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.associacao.application.api.TokenResponse;
 import com.example.demo.associacao.domain.AssociacaoDiscord;
 import com.example.demo.associacao.infra.AssociacaoDiscordRepository;
 import com.example.demo.comunicacao.infra.DiscordClient;
@@ -24,7 +25,7 @@ public class AssociacaoApplicationService implements AssociacaoService {
 	private final DiscordService discordService;
 	
 	@Override
-	public String gerarOuObterLinkConvite() {
+	public TokenResponse gerarOuObterLinkConvite() {
 		log.info("[inicia] AssociacaoApplicationService - gerarOuObterLinkConvite");
 		DiscordConviteRequest conviteRequest = new DiscordConviteRequest(1, true, 0);
 		DiscordConviteResponse convite = discordClient.criaConviteDoCanalParaWakander(conviteRequest);
@@ -32,14 +33,14 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		repository.save(new AssociacaoDiscord(convite.getCode()));
 		log.info("[url]: {}", url);
 		log.info("[finaliza] AssociacaoApplicationService - gerarOuObterLinkConvite");
-		return "URL:   " + url + "         -         Token:   " + convite.getCode();
+		return new TokenResponse(url, convite.getCode());
 	}
 
 	@Override
 	public void associarUsuario(String username, String idDiscord, String token) {
 		log.info("[inicia] AssociacaoApplicationService - associarUsuario");
 		AssociacaoDiscord associacao = repository.findByToken(token)
-				.orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Usuario não encontrado!"));
+				.orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Token inválido!"));
 		associacao.validaSeJaFoiAssociado();
 		associacao.associar(username, idDiscord);
 		repository.save(associacao);
@@ -51,7 +52,7 @@ public class AssociacaoApplicationService implements AssociacaoService {
 	public AssociacaoDiscord buscaPorToken(String token) {
 		log.info("[inicia] AssociacaoApplicationService - buscaPorToken");
 		AssociacaoDiscord associacao = repository.findByToken(token)
-				.orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Associacao não encontrada"));
+				.orElseThrow(() -> APIException.build(HttpStatus.NOT_FOUND, "Token inválido!"));
 		return associacao;
 	}
 

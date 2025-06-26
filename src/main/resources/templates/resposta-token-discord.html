@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <title>Status do Token</title>
@@ -27,47 +27,64 @@
     }
 
     @keyframes gradientMove {
-      0% {
-        background-position: 0% 50%;
-      }
-      50% {
-        background-position: 100% 50%;
-      }
-      100% {
-        background-position: 0% 50%;
-      }
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    .corner-bar {
+      position: absolute;
+      top: -4px;
+      left: 0;
+      width: 100%;
+      height: 30px;
+      background-color: #001f3f;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+      z-index: 1;
     }
 
     .container {
+      position: relative;
       background-color: #ffffff;
-      border-radius: 28px;
+      border-radius: 10px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-      padding: 30px 20px;
-      width: 100%;
-      max-width: 480px;
+      padding: 10px 10px;
+      overflow: hidden;
+	  z-index: 2;
+      animation: fadeIn 0.8s ease-out;
       text-align: center;
     }
 
-    .message {
-      font-size: 18px;
+    .success-text {
+      color: #001f3f;
+      font-size: 17px;
       font-weight: 600;
-      margin-bottom: 10px;
+      padding: 10px 0;
     }
 
-    .success {
-      color: #007a6d;
+    @media screen and (max-width: 480px) {
+      .success-text {
+        font-size: 14.5px;
+      }
     }
-
-    .error {
-      color: #cc0000;
-    }
-
   </style>
 </head>
 <body>
-  <div class="container">
-    <div th:if="${mensagemSucesso}" class="message success" th:text="${mensagemSucesso}"></div>
-    <div th:if="${mensagemErro}" class="message error" th:text="${mensagemErro}"></div>
+  <div class="wrapper">
+    <div class="corner-bar"></div>
+
+    <div class="container">
+      <p class="success-text">
+        ✅ Sua conta foi associada com sucesso.
+      </p>
+    </div>
   </div>
 </body>
 </html>

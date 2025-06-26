@@ -25,30 +25,23 @@ import lombok.extern.log4j.Log4j2;
 public class AssociacaoController {
 	private final AssociacaoService associacaoService;
 
-	@GetMapping("/{username}/{idDiscord}/{token}/associar-discord")
-	@ResponseStatus(value = HttpStatus.OK)
-	public void associarContaDiscord(@PathVariable String username, @PathVariable String idDiscord, @PathVariable String token) {
-		log.info("[inicia] AssociacaoController - associarContaDiscord");
-		associacaoService.associarUsuario(username, idDiscord, token);
-		log.info("[finaliza] AssociacaoController - associarContaDiscord");
-	}
-
-	@GetMapping("/gerar-link")
-	public String gerarLinkConvite() {
-		log.info("[inicia] AssociacaoController - gerarLinkConvite");
-		String link = associacaoService.gerarOuObterLinkConvite();
-		log.info("[finaliza] AssociacaoController - gerarLinkConvite");
-		return link;
-	}
-
 	@PostMapping("/associar-discord")
 	@ResponseStatus(value = HttpStatus.OK)
 	public void associarContaDiscord(@RequestBody DiscordRequest request) {
 		log.info("[inicia] AssociacaoController - associarContaDiscord");
 		log.info("[request] {}", request.toString());
-//		associacaoService.associarUsuario(request.getUsername(), request.getIdDiscord(), request.getToken());
+		associacaoService.associarUsuario(request.getNome(), request.getIdDiscord(), request.getToken());
 		log.info("[finaliza] AssociacaoController - associarContaDiscord");
 	}
+	
+	@GetMapping("/gerar-link")
+	public TokenResponse gerarLinkConvite() {
+		log.info("[inicia] AssociacaoController - gerarLinkConvite");
+		TokenResponse response = associacaoService.gerarOuObterLinkConvite();
+		log.info("[finaliza] AssociacaoController - gerarLinkConvite");
+		return response;
+	}
+
 	@GetMapping("/{token}")
 	public AssociacaoDiscord buscaPorToken(@PathVariable String token) {
 		return associacaoService.buscaPorToken(token);

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gerenciamento Discord</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(270deg, #001f3f, #004080, #001f3f);
+      background-size: 600% 600%;
+      animation: gradientMove 12s ease infinite;
+      padding: 20px;
+      color: #fff;
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      background: #ffffff;
+      color: #000;
+      border-radius: 20px;
+      padding: 30px;
+      max-width: 700px;
+      margin: auto;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    button {
+      background: #002b5b;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #004080;
+    }
+
+    .response {
+      margin-top: 25px;
+    }
+
+    .card {
+      background: #f9f9f9;
+      border-left: 5px solid #002b5b;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      color: #000;
+    }
+
+    .card .info {
+      margin: 4px 0;
+    }
+
+    .status-true {
+      color: green;
+      font-weight: 600;
+    }
+
+    .status-false {
+      color: red;
+      font-weight: 600;
+    }
+
+    .error-msg {
+      color: red;
+      background: #fff0f0;
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    @media screen and (max-width: 500px) {
+      .container {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Gerenciamento de Associação Discord</h2>
+
+    <div class="input-group">
+      <label for="token">Token</label>
+      <input id="token" type="text" placeholder="Informe o token do usuário">
+    </div>
+
+    <div class="actions">
+      <button onclick="buscarPorToken()">🔍 Buscar por Token</button>
+      <button onclick="listarTodos()">📃 Listar Todos</button>
+      <button onclick="desassociar()">🚫 Desassociar</button>
+      <button onclick="deletarTudo()">💥 Deletar Tudo</button>
+      <button onclick="gerarLink()">🔗 Gerar Link</button>
+    </div>
+
+    <div class="response" id="resposta">Aguardando ação...</div>
+  </div>
+
+  <script>
+    const baseUrl = "/api/associacao";
+
+    function getInput(id) {
+      return document.getElementById(id).value.trim();
+    }
+
+    function limparResposta() {
+      document.getElementById("resposta").innerHTML = "";
+    }
+
+    function exibirMensagem(msg, erro = false) {
+      const el = document.getElementById("resposta");
+      el.innerHTML = `<div class="${erro ? 'error-msg' : ''}">${msg}</div>`;
+    }
+
+    function criarCard(d) {
+      return `
+        <div class="card">
+          ${d.nomeUsuario ? `<div class="info"><strong>Usuário:</strong> ${d.nomeUsuario}</div>` : ""}
+          ${d.discordId ? `<div class="info"><strong>ID Discord:</strong> ${d.discordId}</div>` : ""}
+          <div class="info"><strong>Token:</strong> ${d.token}</div>
+          <div class="info"><strong>Status:</strong>
+            <span class="${d.associado ? 'status-true' : 'status-false'}">
+              ${d.associado ? '✅ Associado' : '❌ Não associado'}
+            </span>
+          </div>
+        </div>`;
+    }
+
+    async function buscarPorToken() {
+      const token = getInput("token");
+      if (!token) return exibirMensagem("⚠️ Informe o token.", true);
+
+      limparResposta();
+
+      try {
+        const res = await fetch(`${baseUrl}/${token}`);
+        const data = await res.json();
+        if (data.message) {
+          exibirMensagem(data.message, true);
+        } else {
+          document.getElementById("resposta").innerHTML = criarCard(data);
+        }
+      } catch {
+        exibirMensagem("Erro ao buscar o token.", true);
+      }
+    }
+
+    async function listarTodos() {
+      limparResposta();
+
+      try {
+        const res = await fetch(`${baseUrl}/`);
+        const data = await res.json();
+
+        if (Array.isArray(data) && data.length > 0) {
+          document.getElementById("resposta").innerHTML =
+            data.map(criarCard).join("");
+        } else {
+          exibirMensagem("Nenhuma associação encontrada.");
+        }
+      } catch {
+        exibirMensagem("Erro ao listar.", true);
+      }
+    }
+
+    async function desassociar() {
+      const token = getInput("token");
+      if (!token) return exibirMensagem("⚠️ Informe o token.", true);
+
+      try {
+        const res = await fetch(`${baseUrl}/${token}/desassociar`);
+        const text = await res.text();
+        exibirMensagem(text);
+      } catch {
+        exibirMensagem("Erro ao desassociar.", true);
+      }
+    }
+
+    async function deletarTudo() {
+      try {
+        const res = await fetch(`${baseUrl}/delete`);
+        const text = await res.text();
+        exibirMensagem(text);
+      } catch {
+        exibirMensagem("Erro ao deletar dados.", true);
+      }
+    }
+
+    async function gerarLink() {
+      try {
+        const res = await fetch(`${baseUrl}/gerar-link`);
+        const data = await res.json();
+        const link = `
+          <div class="card">
+            <div class="info"><strong>Token:</strong> ${data.token}</div>
+            <div class="info"><strong>Link:</strong> <a href="${data.link}" target="_blank">${data.link}</a></div>
+          </div>
+        `;
+        document.getElementById("resposta").innerHTML = link;
+      } catch {
+        exibirMensagem("Erro ao gerar link.", true);
+      }
+    }
+  </script>
+</body>
+</html>

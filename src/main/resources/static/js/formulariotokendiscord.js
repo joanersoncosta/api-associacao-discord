@@ -1,89 +1,56 @@
-const MENSAGENS = {
-  SUCESSO_ASSOCIACAO: 'Token associado com sucesso!',
-  ERRO_ASSOCIACAO: 'Erro ao associar token. Verifique os dados e tente novamente.',
-  ERRO_TECNICO: 'Erro técnico. Tente novamente mais tarde ou entre em contato com o suporte.'
-};
+document.getElementById("discordForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-document.addEventListener('DOMContentLoaded', () => {
-  const form = document.getElementById("discordForm");
-
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    await enviarTokenDiscord();
-  });
-});
-
-async function enviarTokenDiscord() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const nome = urlParams.get('nome');
-  const idDiscord = urlParams.get('id');
+  const urlAtual = window.location.href;
+  const partes = urlAtual.split("/");
+  const nome = partes[partes.length - 3];
+  const idDiscord = partes[partes.length - 2];
   const token = document.getElementById("token").value.trim();
 
-  if (!nome || !idDiscord) {
-    mostrarMensagem('erro', 'Link inválido: nome ou id ausente na URL.');
-    return;
-  }
-
-  if (!token) {
-    mostrarMensagem('erro', 'Por favor, insira seu token.');
-    return;
-  }
-
-  const dados = {
-    nome,
-    idDiscord,
-    token
-  };
-
-  const url = "localhost:8080/api/associacao/associar-discord";
-
-  const telaEscura = document.getElementById('blackScreen');
-  const loader = document.querySelector('.loader');
-  if (telaEscura) telaEscura.style.display = "flex";
-  if (loader) loader.style.display = "flex";
+  const payload = { nome, idDiscord, token };
 
   try {
-    const resposta = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(dados)
+    const resposta = await fetch("/api/associacao/associar-discord", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
     });
 
-    if (!resposta.ok) {
-      const erroApi = await resposta.json();
-      throw new Error(erroApi.message || MENSAGENS.ERRO_ASSOCIACAO);
-    }
+    const respostaTexto = await resposta.text();
 
-    mostrarMensagem('sucesso', MENSAGENS.SUCESSO_ASSOCIACAO);
+    if (resposta.ok) {
+      const sucessoEl = document.getElementById("mensagemSucesso");
+      sucessoEl.innerText = respostaTexto.includes("já foi") 
+        ? "Seu token já foi validado!" 
+        : "Sua conta do Discord foi associada com sucesso.";
+      sucessoEl.style.display = "block";
+
+      document.getElementById("mensagemErro").style.display = "none";
+
+      setTimeout(() => {
+        window.location.href = "/api/formulario/resposta-token-discord";
+      }, 1200);
+    } else {
+      throw new Error(respostaTexto);
+    }
   } catch (erro) {
-    console.error('Erro ao associar:', erro);
-    mostrarMensagem('erro', erro.message || MENSAGENS.ERRO_TECNICO);
-  } finally {
-    if (loader) loader.style.display = "none";
+    const mensagemErro = extrairMensagemErro(erro.message);
+    const erroEl = document.getElementById("mensagemErro");
+    const textoErro = document.getElementById("erroTexto");
+
+    textoErro.innerText = mensagemErro;
+    erroEl.style.display = "flex";
+    document.getElementById("mensagemSucesso").style.display = "none";
   }
-}
+});
 
-function mostrarMensagem(tipo, texto) {
-  const modalFalha = document.getElementById('modal-erro');
-  const modalSucesso = document.getElementById('modal-sucess');
-  const messageErro = document.getElementById('mensagemStatusErro');
-  const messageSucesso = document.getElementById('mensagemStatusSucesso');
-
-  if (tipo === 'sucesso') {
-    if (modalSucesso && messageSucesso) {
-      messageSucesso.textContent = texto;
-      modalSucesso.style.display = 'flex';
-    } else {
-      alert(texto);
-    }
-  } else {
-    if (modalFalha && messageErro) {
-      messageErro.textContent = texto;
-      modalFalha.style.display = 'flex';
-    } else {
-      alert(texto);
-    }
+function extrairMensagemErro(mensagem) {
+  try {
+    const json = JSON.parse(mensagem);
+    return json.message || "Erro inesperado ao validar token.";
+  } catch {
+    return mensagem.includes("Usuario já foi associado")
+      ? "Seu token já foi validado!"
+      : mensagem.toLowerCase().replace("error:", "").trim();
   }
 }
