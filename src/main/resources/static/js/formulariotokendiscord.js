@@ -5,14 +5,20 @@ document.getElementById("discordForm").addEventListener("submit", async function
   const partes = urlAtual.split("/");
   const nome = partes[partes.length - 3];
   const idDiscord = partes[partes.length - 2];
-  const token = document.getElementById("token").value.trim();
+  const token = document.getElementById("token").value;
 
-  const payload = { nome, idDiscord, token };
+  const payload = {
+    nome: nome,
+    idDiscord: idDiscord,
+    token: token
+  };
 
   try {
     const resposta = await fetch("/api/associacao/associar-discord", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json"
+      },
       body: JSON.stringify(payload)
     });
 
@@ -20,11 +26,12 @@ document.getElementById("discordForm").addEventListener("submit", async function
 
     if (resposta.ok) {
       const sucessoEl = document.getElementById("mensagemSucesso");
-      sucessoEl.innerText = respostaTexto.includes("já foi") 
-        ? "Seu token já foi validado!" 
-        : "Sua conta do Discord foi associada com sucesso.";
+      if (respostaTexto.includes("já foi associado") || respostaTexto.includes("já foi validado")) {
+        sucessoEl.innerText = "Seu token já foi validado!";
+      } else {
+        sucessoEl.innerText = "Sua conta do Discord foi associada com sucesso.";
+      }
       sucessoEl.style.display = "block";
-
       document.getElementById("mensagemErro").style.display = "none";
 
       setTimeout(() => {
@@ -36,10 +43,8 @@ document.getElementById("discordForm").addEventListener("submit", async function
   } catch (erro) {
     const mensagemErro = extrairMensagemErro(erro.message);
     const erroEl = document.getElementById("mensagemErro");
-    const textoErro = document.getElementById("erroTexto");
-
-    textoErro.innerText = mensagemErro;
-    erroEl.style.display = "flex";
+    erroEl.innerText = mensagemErro;
+    erroEl.style.display = "block";
     document.getElementById("mensagemSucesso").style.display = "none";
   }
 });
@@ -47,10 +52,10 @@ document.getElementById("discordForm").addEventListener("submit", async function
 function extrairMensagemErro(mensagem) {
   try {
     const json = JSON.parse(mensagem);
-    return json.message || "Erro inesperado ao validar token.";
+    return json.message || "erro inesperado ao validar token.";
   } catch {
-    return mensagem.includes("Usuario já foi associado")
-      ? "Seu token já foi validado!"
-      : mensagem.toLowerCase().replace("error:", "").trim();
+    return mensagem.includes("Usuario já foi associado") ? 
+      "Seu token já foi validado!" : 
+      mensagem.toLowerCase().replace("error:", "").trim();
   }
 }
