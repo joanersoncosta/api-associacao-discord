@@ -54,7 +54,7 @@ public class AssociacaoDiscord {
 
 	public void validaSeJaFoiAssociado() {
 		if (associado == true) {
-			throw APIException.build(HttpStatus.NOT_FOUND, "Usuario já foi associado!");
+			throw APIException.build(HttpStatus.NOT_FOUND, "Esse token já foi associado!");
 		}
 	}
 
