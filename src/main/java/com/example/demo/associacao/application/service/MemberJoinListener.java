@@ -89,7 +89,7 @@ public class MemberJoinListener extends ListenerAdapter {
     }
 
     private String gerarUrlValidacao(String username, String idDiscord) {
-        return String.format("%s/api/formulario/%s/%s//associar-discord", urlInstancia, username, idDiscord);
+        return String.format("%s/api/formulario/%s/%s/associar-discord", urlInstancia, username, idDiscord);
     }
 
     private void validarMembroECargo(Member member, Role role) {
