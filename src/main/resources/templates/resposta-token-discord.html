@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Status do Token</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Montserrat", sans-serif;
+    }
+
+    body {
+      background: linear-gradient(270deg, #001f3f, #004080, #001f3f);
+      background-size: 600% 600%;
+      animation: gradientMove 12s ease infinite;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      padding: 20px;
+    }
+
+    @keyframes gradientMove {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    .container {
+      background-color: #ffffff;
+      border-radius: 28px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      padding: 30px 20px;
+      width: 100%;
+      max-width: 480px;
+      text-align: center;
+    }
+
+    .message {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .success {
+      color: #007a6d;
+    }
+
+    .error {
+      color: #cc0000;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div th:if="${mensagemSucesso}" class="message success" th:text="${mensagemSucesso}"></div>
+    <div th:if="${mensagemErro}" class="message error" th:text="${mensagemErro}"></div>
+  </div>
+</body>
+</html>

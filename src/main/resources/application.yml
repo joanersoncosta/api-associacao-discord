@@ -19,7 +19,19 @@ spring:
       connectionTimeout: 30000
       idleTimeout: 30000
       maxLifetime: 1000000
-      
+
+ thymeleaf:
+  prefix: classpath:/templates/
+  suffix: .html
+  cache: false
+  mode: HTML
+  encoding: UTF-8
+  servlet:
+   content-type: text/html
+ web:
+  resources:
+   static-locations: classpath:/static/ 
+     
 z-api:
   instancia-id: ${Z_API_INSTANCIA_ID:1234567}
   token-instancia: ${Z_API_TOKEN_INSTANCIA:1234567}

@@ -1,0 +1,127 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+}
+
+body {
+  background: linear-gradient(270deg, #001f3f, #004080, #001f3f); /* tons escuros e consistentes */
+  background-size: 600% 600%;
+  animation: gradientMove 12s ease infinite; /* movimento mais suave */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  padding: 20px;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+
+
+.container {
+  background-color: #ffffff;
+  border-radius: 28px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 30px 20px;
+  width: 100%;
+  max-width: 480px;
+}
+
+h1 {
+  color: #001f3f;
+  font-size: 24px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+p {
+  color: #333;
+  font-size: 16.5px;
+  font-weight: 500;
+  text-align: left;
+  margin-bottom: 35px;
+  width: 100%;
+  display: block;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.input-group label {
+  color: #001f3f;
+  font-weight: 500;
+  font-size: 16px;
+  min-width: 60px;
+  white-space: nowrap;
+}
+
+.input-group input {
+  flex: 1;
+  padding: 12px 14px;
+  background-color: #cccccc;
+  border: none;
+  border-radius: 12px;
+  font-size: 15px;
+  min-width: 0;
+  transition: all 0.2s ease-in-out;
+}
+
+.input-group input:focus {
+  outline: none;
+  background-color: #e0e0e0;
+}
+
+button {
+  width: 60%;
+  background-color: #001f3f;
+  color: #ffffff;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 10px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 13px;
+  margin: 30px auto 0;
+  display: block;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #334d6e;
+}
+
+@media screen and (max-width: 480px) {
+  h1 {
+    font-size: 20px; /* título menor em telas pequenas */
+  }
+
+  p {
+    font-size: 13px;     /* texto menor */
+    text-align: justify; /* alinhado para leitura melhor em mobile */
+  }
+
+  .input-group {
+    flex-wrap: nowrap;
+  }
+}
