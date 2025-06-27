@@ -115,6 +115,18 @@
       border-radius: 8px;
     }
 
+    .loading-spinner {
+      display: inline-block;
+      animation: girar 2s linear infinite;
+      font-size: 20px;
+      margin-right: 6px;
+    }
+
+    @keyframes girar {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
     @media screen and (max-width: 500px) {
       .container {
         padding: 20px;
@@ -153,6 +165,11 @@
       document.getElementById("resposta").innerHTML = "";
     }
 
+    function mostrarAguardando() {
+      const el = document.getElementById("resposta");
+      el.innerHTML = `<div><span class="loading-spinner">⏳</span> Aguarde...</div>`;
+    }
+
     function exibirMensagem(msg, erro = false) {
       const el = document.getElementById("resposta");
       el.innerHTML = `<div class="${erro ? 'error-msg' : ''}">${msg}</div>`;
@@ -176,7 +193,7 @@
       const token = getInput("token");
       if (!token) return exibirMensagem("⚠️ Informe o token.", true);
 
-      limparResposta();
+      mostrarAguardando();
 
       try {
         const res = await fetch(`${baseUrl}/${token}`);
@@ -192,7 +209,7 @@
     }
 
     async function listarTodos() {
-      limparResposta();
+      mostrarAguardando();
 
       try {
         const res = await fetch(`${baseUrl}/`);
@@ -213,6 +230,8 @@
       const token = getInput("token");
       if (!token) return exibirMensagem("⚠️ Informe o token.", true);
 
+      mostrarAguardando();
+
       try {
         const res = await fetch(`${baseUrl}/${token}/desassociar`);
         const text = await res.text();
@@ -223,6 +242,8 @@
     }
 
     async function deletarTudo() {
+      mostrarAguardando();
+
       try {
         const res = await fetch(`${baseUrl}/delete`);
         const text = await res.text();
@@ -233,6 +254,8 @@
     }
 
     async function gerarLink() {
+      mostrarAguardando();
+
       try {
         const res = await fetch(`${baseUrl}/gerar-link`);
         const data = await res.json();

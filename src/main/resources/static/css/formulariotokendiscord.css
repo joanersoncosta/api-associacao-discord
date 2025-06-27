@@ -24,6 +24,17 @@ body {
   100% { background-position: 0% 50%; }
 }
 
+.loading-spinner {
+  display: inline-block;
+  animation: slow-spin 2s linear infinite;
+  margin-right: 6px;
+}
+
+@keyframes slow-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .wrapper {
   position: relative;
   width: 100%;

@@ -7,8 +7,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.example.demo.associacao.application.service.AssociacaoService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
@@ -17,7 +15,6 @@ import lombok.extern.log4j.Log4j2;
 @RestController
 @RequestMapping("/formulario")
 public class FormularioController {
-	private final AssociacaoService associacaoService;
 
 	@GetMapping("/{username}/{idDiscord}/associar-discord")
 	@ResponseStatus(value = HttpStatus.OK)
