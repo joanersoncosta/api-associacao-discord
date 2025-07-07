@@ -61,15 +61,26 @@ public class DiscordApplicationService implements DiscordService {
 			removeRoleOnboarding(guild, member, roleFalha);
 			removeRoleOnboarding(guild, member, roleValidado);
 			guild.addRoleToMember(member, roleWakander).queue();
-			removeMensagens(member, ID_CANAL_VALIDACAO);
-			removeMensagens(member, ID_CANAL_INICIAR_VALIDACAO);
-			removeMensagens(member, ID_CANAL_FALHA);
+			removeMensagens(member, ID_CANAL_VALIDACAO, ID_CANAL_INICIAR_VALIDACAO, ID_CANAL_FALHA);
 		}, failure -> {
 			log.warn("❌ Falha ao buscar membro com ID {}: {}", idDiscord, failure.getMessage());
 			throw APIException.build(HttpStatus.NOT_FOUND, "Membro não encontrado!");
 		});
 	}
-
+	
+	private void removeMensagens(Member member, String... idsCanais) {
+		for (String idCanal : idsCanais) {
+			TextChannel onboardingChannel = jda.getTextChannelById(idCanal);
+			if (onboardingChannel != null) {
+				onboardingChannel.getHistory().retrievePast(100).queue(messages -> {
+					messages.stream()
+						.filter(msg -> msg.getMentions().getUsers().contains(member.getUser()))
+						.forEach(msg -> msg.delete().queue());
+				});
+			}
+		}
+	}
+	
 	private void validaSeMembroExiste(Member member) {
 		if (member == null) {
 			log.warn("❌ Membro ainda é null após retrieveMemberById");
@@ -77,15 +88,6 @@ public class DiscordApplicationService implements DiscordService {
 		}
 	}
 
-	private void removeMensagens(Member member, String idCanal) {
-		TextChannel onboardingChannel = jda.getTextChannelById(idCanal);
-		if (onboardingChannel != null) {
-			onboardingChannel.getHistory().retrievePast(100).queue(messages -> {
-				messages.stream().filter(msg -> msg.getMentions().getUsers().contains(member.getUser()))
-						.forEach(msg -> msg.delete().queue());
-			});
-		}
-	}
 
 	private void removeRoleOnboarding(Guild guild, Member member, Role roleOnboarding) {
 		if (roleOnboarding != null && member.getRoles().contains(roleOnboarding)) {
