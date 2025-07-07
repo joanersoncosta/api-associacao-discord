@@ -1,5 +1,7 @@
 package com.example.demo.associacao.application.service;
 
+import java.time.OffsetDateTime;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -162,7 +164,7 @@ public class MemberJoinListener extends ListenerAdapter {
         if (canal != null) {
             canal.sendMessage(member.getAsMention() + " clicou para iniciar a validação. ✅").queue();
         }
-
+        limparMensagensAntigas(canal);
     }
     
     private void enviarMensagemPrivadaOuFallback(Member member, User user, Guild guild) {
@@ -175,5 +177,14 @@ public class MemberJoinListener extends ListenerAdapter {
             privateChannel -> enviarMensagemPrivada(privateChannel, user, member, canalOnboarding),
             failure -> notificarFalhaNaDM(member, guild)
         );
+	}
+	
+	private void limparMensagensAntigas(TextChannel canal) {
+	    canal.getHistory().retrievePast(100).queue(messages -> {
+	        OffsetDateTime limite = OffsetDateTime.now().minusDays(14);
+	        messages.stream()
+	            .filter(msg -> msg.getTimeCreated().isBefore(limite))
+	            .forEach(msg -> msg.delete().queue());
+	    });
 	}
 }
