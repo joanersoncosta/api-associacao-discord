@@ -1,6 +1,7 @@
 package com.example.demo.associacao.application.service;
 
 import java.time.OffsetDateTime;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -146,8 +147,10 @@ public class MemberJoinListener extends ListenerAdapter {
         Guild guild = event.getGuild();
         if (member == null || guild == null || member.getUser().isBot()) return;
 
-        event.deferReply(true).queue();
-        
+        event.reply("✅ Validação iniciada!")
+        	.setEphemeral(false)
+        	.queue(interactionHook -> {
+            interactionHook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS);});
         Role cargoWakander = guild.getRoleById(ID_CARGO_WAKANDER);
         Role cargoValidacao = guild.getRoleById(ID_CARGO_MEMBRO_VALIDACAO);
 
