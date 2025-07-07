@@ -78,7 +78,7 @@ public class DiscordApplicationService implements DiscordService {
 	}
 
 	private void removeMensagens(Member member, String idCanal) {
-		TextChannel onboardingChannel = jda.getTextChannelById(ID_CANAL_VALIDACAO);
+		TextChannel onboardingChannel = jda.getTextChannelById(idCanal);
 		if (onboardingChannel != null) {
 			onboardingChannel.getHistory().retrievePast(100).queue(messages -> {
 				messages.stream().filter(msg -> msg.getMentions().getUsers().contains(member.getUser()))
