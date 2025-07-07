@@ -144,7 +144,7 @@ public class MemberJoinListener extends ListenerAdapter {
         Guild guild = event.getGuild();
         if (member == null || guild == null || member.getUser().isBot()) return;
 
-        event.reply("✅ Validação iniciada!").setEphemeral(true).queue();
+        event.deferReply(true).queue();
         
         Role cargoWakander = guild.getRoleById(ID_CARGO_WAKANDER);
         Role cargoValidacao = guild.getRoleById(ID_CARGO_MEMBRO_VALIDACAO);
@@ -163,7 +163,6 @@ public class MemberJoinListener extends ListenerAdapter {
             canal.sendMessage(member.getAsMention() + " clicou para iniciar a validação. ✅").queue();
         }
 
-        event.getHook().editOriginal("✅ Validação iniciada!").queue();
     }
     
     private void enviarMensagemPrivadaOuFallback(Member member, User user, Guild guild) {
@@ -177,12 +176,4 @@ public class MemberJoinListener extends ListenerAdapter {
             failure -> notificarFalhaNaDM(member, guild)
         );
 	}
-    
-    private void deletarMensagensDoUsuario(TextChannel canal, User usuario) {
-        canal.getHistory().retrievePast(100).queue(messages -> {
-            messages.stream()
-                .filter(msg -> msg.getAuthor().equals(usuario))
-                .forEach(msg -> msg.delete().queue());
-        });
-    }
 }
