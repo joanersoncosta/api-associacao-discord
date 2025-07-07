@@ -23,6 +23,7 @@ public class DiscordApplicationService implements DiscordService {
 	private static final String ID_GUILD = "1374404660906950718";
     private static final String ID_CANAL_VALIDACAO = "1374404661670318143";
     private static final String ID_CANAL_INICIAR_VALIDACAO = "1391784645535993919";
+    private static final String ID_CANAL_FALHA = "1391760038246481970";
 	private static final String ID_CARGO_MEMBRO_VALIDACAO = "1387064641410044076";
 	private static final String ID_CARGO_WAKANDER = "1387069524679065750";
     private static final String ID_CARGO_FALHA = "1391761026772369448";
@@ -60,7 +61,9 @@ public class DiscordApplicationService implements DiscordService {
 			removeRoleOnboarding(guild, member, roleFalha);
 			removeRoleOnboarding(guild, member, roleValidado);
 			guild.addRoleToMember(member, roleWakander).queue();
-			removeMensagens(member, ID_CANAL_VALIDACAO, ID_CANAL_INICIAR_VALIDACAO, ID_CANAL_VALIDACAO);
+			removeMensagens(member, ID_CANAL_VALIDACAO);
+			removeMensagens(member, ID_CANAL_INICIAR_VALIDACAO);
+			removeMensagens(member, ID_CANAL_FALHA);
 		}, failure -> {
 			log.warn("❌ Falha ao buscar membro com ID {}: {}", idDiscord, failure.getMessage());
 			throw APIException.build(HttpStatus.NOT_FOUND, "Membro não encontrado!");
@@ -73,8 +76,8 @@ public class DiscordApplicationService implements DiscordService {
 			throw APIException.build(HttpStatus.NOT_FOUND, "Membro não encontrado!");
 		}
 	}
-	
-	private void removeMensagens(Member member, String... idCanal) {
+
+	private void removeMensagens(Member member, String idCanal) {
 		TextChannel onboardingChannel = jda.getTextChannelById(ID_CANAL_VALIDACAO);
 		if (onboardingChannel != null) {
 			onboardingChannel.getHistory().retrievePast(100).queue(messages -> {
