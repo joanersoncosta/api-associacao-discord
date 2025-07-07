@@ -63,4 +63,10 @@ public class AssociacaoController {
 		associacaoService.desassociar(token);
 		return "Desassociar usuario";
 	}
+	
+	@GetMapping("/discord/trocar-cargo")
+	public String trocarCargo() {
+		associacaoService.substituirCargoDefaultPorWakander();
+		return "Cargos trocados com sucesso";
+	}
 }

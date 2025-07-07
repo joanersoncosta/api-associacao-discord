@@ -12,4 +12,5 @@ public interface AssociacaoService {
 	List<AssociacaoDiscord> lista();
 	void deleteAll();
 	void desassociar(String token);
+	void substituirCargoDefaultPorWakander();
 }

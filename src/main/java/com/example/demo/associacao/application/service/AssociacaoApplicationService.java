@@ -75,4 +75,10 @@ public class AssociacaoApplicationService implements AssociacaoService {
 		repository.save(associacao);
 	}
 
+	@Override
+	public void substituirCargoDefaultPorWakander() {
+		log.info("[inicia] AssociacaoApplicationService - substituirCargoDefaultPorWakander");
+		discordService.substituirCargoDefaultPorWakander();
+		log.info("[finaliza] AssociacaoApplicationService - substituirCargoDefaultPorWakander");
+	}
 }
