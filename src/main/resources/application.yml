@@ -39,9 +39,9 @@ z-api:
 
 discord:
   channel:
-    id: ${ID_CHANNEL_DISCORD:123456}
+    id: ${ID_CHANNEL_DISCORD:23456}
   bot:
-    token: ${DISCORD_TOKEN:bot234567}
+    token: ${DISCORD_TOKEN:MTESTEcQ}
 
 aws:
   url: ${AWS_URL:http://localhost:8080}

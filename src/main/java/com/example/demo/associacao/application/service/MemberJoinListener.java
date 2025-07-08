@@ -2,6 +2,7 @@ package com.example.demo.associacao.application.service;
 
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -24,16 +25,15 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class MemberJoinListener extends ListenerAdapter {
     @Value("${aws.url}")
     private String urlInstancia;
-    private static final String ID_BOT = "1374448871836745853";
-    private static final String ID_CANAL_VALIDACAO = "1374404661670318143";
-    private static final String ID_CANAL_FALHA = "1391760038246481970";
-    private static final String ID_CANAL_INICIAR_VALIDACAO = "1391784645535993919";
+    private static final String ID_CANAL_VALIDACAO = "1390403777323864074";
+    private static final String ID_CANAL_FALHA = "1390416969278165032";
+    private static final String ID_CANAL_INICIAR_VALIDACAO = "1391886723151171714";
 
-    private static final String ID_CARGO_MEMBRO_VALIDACAO = "1387064641410044076";
-    private static final String ID_CARGO_DEFAULT = "1387064641410044076";
-    private static final String ID_CARGO_FALHA = "1391761026772369448";
-    private static final String ID_CARGO_WAKANDER = "1387069524679065750";
-
+    private static final String ID_BOT = "1391917606147068036";
+    private static final String ID_CARGO_MEMBRO_VALIDACAO = "1391892125326774362";
+    private static final String ID_CARGO_DEFAULT = "1391854218276503552";
+    private static final String ID_CARGO_FALHA = "1391891594436939846";
+    
     @Override
     public void onGuildMemberJoin(GuildMemberJoinEvent event) {
         log.info("[inicia] MemberJoinListener - onGuildMemberJoin");
@@ -141,6 +141,7 @@ public class MemberJoinListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        log.info("[inicia] MemberJoinListener - onButtonInteraction");
         if (!event.getComponentId().equals("validar:botao")) return;
 
         Member member = event.getMember();
@@ -148,16 +149,24 @@ public class MemberJoinListener extends ListenerAdapter {
         if (member == null || guild == null || member.getUser().isBot()) return;
 
         event.reply("✅ Validação iniciada!")
-        	.setEphemeral(false)
-        	.queue(interactionHook -> {
-            interactionHook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS);});
-        Role cargoWakander = guild.getRoleById(ID_CARGO_WAKANDER);
+            .setEphemeral(false)
+            .queue(interactionHook ->
+                interactionHook.deleteOriginal().queueAfter(5, TimeUnit.SECONDS)
+            );
+
+        Role cargoDefault = guild.getRoleById(ID_CARGO_DEFAULT);
         Role cargoValidacao = guild.getRoleById(ID_CARGO_MEMBRO_VALIDACAO);
 
-        if (cargoWakander != null && member.getRoles().contains(cargoWakander)) {
-            removerCargo(member, cargoWakander);
+        log.info("Cargos atuais de {}: {}", member.getEffectiveName(),
+                 member.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
+
+        if (cargoDefault != null) {
+            log.info("Removendo cargo default: {}", cargoDefault.getName());
+            removerCargo(member, cargoDefault);
         }
-        if (cargoValidacao != null) {
+
+        if (cargoValidacao != null && !member.getRoles().contains(cargoValidacao)) {
+            log.info("Adicionando cargo de validação: {}", cargoValidacao.getName());
             adicionarCargo(member, cargoValidacao);
         }
 
@@ -166,9 +175,10 @@ public class MemberJoinListener extends ListenerAdapter {
         TextChannel canal = guild.getTextChannelById(ID_CANAL_INICIAR_VALIDACAO);
         if (canal != null) {
             canal.sendMessage(member.getAsMention() + " clicou para iniciar a validação. ✅").queue();
+            limparMensagensAntigas(canal);
         }
-        limparMensagensAntigas(canal);
     }
+
     
     private void enviarMensagemPrivadaOuFallback(Member member, User user, Guild guild) {
         TextChannel canal = guild.getTextChannelById(ID_CANAL_VALIDACAO);
@@ -184,7 +194,7 @@ public class MemberJoinListener extends ListenerAdapter {
 	
 	private void limparMensagensAntigas(TextChannel canal) {
 	    canal.getHistory().retrievePast(100).queue(messages -> {
-	        OffsetDateTime limite = OffsetDateTime.now().minusDays(14);
+	        OffsetDateTime limite = OffsetDateTime.now().minusDays(3);
 	        messages.stream()
 	            .filter(msg -> msg.getTimeCreated().isBefore(limite))
 	            .forEach(msg -> msg.delete().queue());

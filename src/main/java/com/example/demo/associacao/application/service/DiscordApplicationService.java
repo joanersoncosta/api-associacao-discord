@@ -20,13 +20,14 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 @RequiredArgsConstructor
 public class DiscordApplicationService implements DiscordService {
 	private final JDA jda;
-	private static final String ID_GUILD = "1374404660906950718";
-    private static final String ID_CANAL_VALIDACAO = "1374404661670318143";
-    private static final String ID_CANAL_INICIAR_VALIDACAO = "1391784645535993919";
-    private static final String ID_CANAL_FALHA = "1391760038246481970";
-	private static final String ID_CARGO_MEMBRO_VALIDACAO = "1387064641410044076";
-	private static final String ID_CARGO_WAKANDER = "1387069524679065750";
-    private static final String ID_CARGO_FALHA = "1391761026772369448";
+    private static final String ID_GUILD = "963147104258256957";
+    private static final String ID_CANAL_VALIDACAO = "1390403777323864074";
+    private static final String ID_CANAL_FALHA = "1390416969278165032";
+    private static final String ID_CANAL_INICIAR_VALIDACAO = "1391886723151171714";
+    
+    private static final String ID_CARGO_MEMBRO_VALIDACAO = "1391892125326774362";
+    private static final String ID_CARGO_WAKANDER = "1391893372645671052";
+    private static final String ID_CARGO_FALHA = "1391891594436939846";
 
     @PostConstruct
     public void enviarMensagemInicialComBotao() {
@@ -35,15 +36,14 @@ public class DiscordApplicationService implements DiscordService {
             canal.getIterableHistory().takeAsync(10).thenAccept(messages -> {
                 boolean jaTemMensagem = messages.stream().anyMatch(msg -> msg.getAuthor().isBot());
                 if (!jaTemMensagem) {
-                    canal.sendMessage("\uD83D\uDC4B Seja bem-vindo(a) à Guild Wakanda!\n\n" +
-                            "Para liberar seu acesso, clique no botão abaixo para iniciar sua validação:")
-                        .setActionRow(Button.primary("validar:botao", "✅ Validar Agora"))
+                    canal.sendMessage("**🎯 Para validar sua conta e ter novamente acesso aos canais:**\n" +
+                            "Clique no botão abaixo para iniciar sua validação:")
+                            .setActionRow(Button.primary("validar:botao", "✅ Validar Agora"))
                         .queue();
                 }
             });
         }
     }
-    
 	public void atualizaCargoParaWakander(String idDiscord) {
 		log.info("[inicia] DiscordApplicationService - atualizaCargoParaWakander");
 		Guild guild = jda.getGuildById(ID_GUILD);
@@ -58,21 +58,20 @@ public class DiscordApplicationService implements DiscordService {
 			Role roleValidado = guild.getRoleById(ID_CARGO_MEMBRO_VALIDACAO);
 			Role roleFalha = guild.getRoleById(ID_CARGO_FALHA);
 			validaRole(roleWakander, roleValidado);
-			removeRoleOnboarding(guild, member, roleFalha);
-			removeRoleOnboarding(guild, member, roleValidado);
+			removeRole(guild, member, roleFalha, roleValidado);
 			guild.addRoleToMember(member, roleWakander).queue();
 			removeMensagens(member, ID_CANAL_VALIDACAO, ID_CANAL_INICIAR_VALIDACAO, ID_CANAL_FALHA);
 		}, failure -> {
-			log.warn("❌ Falha ao buscar membro com ID {}: {}", idDiscord, failure.getMessage());
+			log.warn("Falha ao buscar membro com ID {}: {}", idDiscord, failure.getMessage());
 			throw APIException.build(HttpStatus.NOT_FOUND, "Membro não encontrado!");
 		});
 	}
 	
-	private void removeMensagens(Member member, String... idsCanais) {
-		for (String idCanal : idsCanais) {
-			TextChannel onboardingChannel = jda.getTextChannelById(idCanal);
-			if (onboardingChannel != null) {
-				onboardingChannel.getHistory().retrievePast(100).queue(messages -> {
+	private void removeMensagens(Member member, String... idCanais) {
+		for (String idCanal : idCanais) {
+			TextChannel channel = jda.getTextChannelById(idCanal);
+			if (channel != null) {
+				channel.getHistory().retrievePast(100).queue(messages -> {
 					messages.stream()
 						.filter(msg -> msg.getMentions().getUsers().contains(member.getUser()))
 						.forEach(msg -> msg.delete().queue());
@@ -83,21 +82,24 @@ public class DiscordApplicationService implements DiscordService {
 	
 	private void validaSeMembroExiste(Member member) {
 		if (member == null) {
-			log.warn("❌ Membro ainda é null após retrieveMemberById");
+			log.warn("Membro ainda é null após retrieveMemberById");
 			throw APIException.build(HttpStatus.NOT_FOUND, "Membro não encontrado!");
 		}
 	}
 
-
-	private void removeRoleOnboarding(Guild guild, Member member, Role roleOnboarding) {
-		if (roleOnboarding != null && member.getRoles().contains(roleOnboarding)) {
-			guild.removeRoleFromMember(member, roleOnboarding).queue();
+	private void removeRole(Guild guild, Member member, Role... roles) {
+		for (Role role : roles) {
+			if (role != null && member.getRoles().contains(role)) {
+				guild.removeRoleFromMember(member, role).queue();
+			}
 		}
 	}
 
-	private void validaRole(Role... roleWakander) {
-		if (roleWakander == null) {
-			throw APIException.build(HttpStatus.NOT_FOUND, "Membro ou cargo não encontrado!");
+	private void validaRole(Role... roles) {
+		for (Role role : roles) {
+			if (role == null) {
+				throw APIException.build(HttpStatus.NOT_FOUND, "Membro ou cargo não encontrado!");
+			}
 		}
 	}
 
