@@ -1,6 +1,7 @@
 package com.example.demo.associacao.application.api;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +34,7 @@ public class AssociacaoController {
 		associacaoService.associarUsuario(request.getNome(), request.getIdDiscord(), request.getToken());
 		log.info("[finaliza] AssociacaoController - associarContaDiscord");
 	}
-	
+
 	@GetMapping("/gerar-link")
 	public TokenResponse gerarLinkConvite() {
 		log.info("[inicia] AssociacaoController - gerarLinkConvite");
@@ -46,27 +47,32 @@ public class AssociacaoController {
 	public AssociacaoDiscord buscaPorToken(@PathVariable String token) {
 		return associacaoService.buscaPorToken(token);
 	}
-	
+
 	@GetMapping("/")
 	public List<AssociacaoDiscord> lista() {
 		return associacaoService.lista();
 	}
-	
+
 	@GetMapping("/delete")
 	public String deleteAll() {
 		associacaoService.deleteAll();
 		return "Dados Deletas com sucesso";
 	}
-	
+
 	@GetMapping("/{token}/desassociar")
 	public String desassociar(@PathVariable String token) {
 		associacaoService.desassociar(token);
 		return "Desassociar usuario";
 	}
-	
-	@GetMapping("/discord/trocar-cargo")
-	public String trocarCargo() {
-		associacaoService.substituirCargoDefaultPorWakander();
+
+	@GetMapping("/discord/{idDiscord}/trocar-cargo")
+	public String trocarCargo(@PathVariable String idDiscord) {
+		associacaoService.substituirCargoDefaultPorWakander(idDiscord);
 		return "Cargos trocados com sucesso";
+	}
+
+	@GetMapping("/discord/sem-cargo")
+	public CompletableFuture<Integer> contarSemCargo() {
+		return associacaoService.contaQuantosSemCargoExistem();
 	}
 }

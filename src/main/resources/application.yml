@@ -37,11 +37,23 @@ z-api:
   token-instancia: ${Z_API_TOKEN_INSTANCIA:1234567}
   token-cliente: ${Z_API_TOKEN_CLIENTE:1234567}
 
-discord:
-  channel:
-    id: ${ID_CHANNEL_DISCORD:23456}
-  bot:
-    token: ${DISCORD_TOKEN:MTESTEcQ}
-
 aws:
   url: ${AWS_URL:http://localhost:8080}
+
+discord:
+  api-url: https://discord.com
+  bot:
+    token: ${DISCORD_TOKEN:1234567}
+  guild-wakanda:
+    id: ${DISCORD_GUILD_ID:1234567}
+  channels:
+    id: ${DISCORD_ID_CHANNEL:1234567}    
+    validacao: ${DISCORD_ID_CANAL_VALIDACAO:1234567}
+    falha: ${DISCORD_ID_CANAL_FALHA:1234567}
+    iniciar-validacao: ${DISCORD_ID_CANAL_INICIAR_VALIDACAO:1234567}
+  roles:
+    membro-validado: ${DISCORD_ID_CARGO_MEMBRO_VALIDADO:1234567}
+    default-role: ${DISCORD_ID_CARGO_DEFAULT:1234567}
+    wakander: ${DISCORD_ID_CARGO_WAKANDER:1234567}
+    falha: ${DISCORD_ID_CARGO_FALHA:1234567}
+    membro-cancelado: ${DISCORD_ID_CARGO_CANCELADO:1234567}

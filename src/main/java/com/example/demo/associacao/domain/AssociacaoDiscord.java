@@ -18,27 +18,27 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Entity
-@Table(name = "associacao_discord")
+//@Entity
+//@Table(name = "associacao_discord")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AssociacaoDiscord {
-
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(columnDefinition = "uuid", name = "id_associacao")
+//
+//	@Id
+//	@GeneratedValue(strategy = GenerationType.AUTO)
+//	@Column(columnDefinition = "uuid", name = "id_associacao")
 	private UUID idAssociacao;
 
-	@Column(unique = true, name = "nome_usuario")
+//	@Column(unique = true, name = "nome_usuario")
 	private String nomeUsuario;
 
-	@Column(name = "discord_id")
+//	@Column(name = "discord_id")
 	private String discordId;
 
-	@Column(unique = true)
+//	@Column(unique = true)
 	private String token;
 
-	@Column(name = "associado")
+//	@Column(name = "associado")
 	private boolean associado;
 
 	public void associar(String nome, String idDiscord) {

@@ -1,8 +1,10 @@
 package com.example.demo.associacao.application.service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.associacao.application.api.TokenResponse;
@@ -76,9 +78,14 @@ public class AssociacaoApplicationService implements AssociacaoService {
 	}
 
 	@Override
-	public void substituirCargoDefaultPorWakander() {
+	public void substituirCargoDefaultPorWakander(String idDiscord) {
 		log.info("[inicia] AssociacaoApplicationService - substituirCargoDefaultPorWakander");
-		discordService.substituirCargoDefaultPorWakander();
+		discordService.substituirCargoDefaultPorWakander(idDiscord);
 		log.info("[finaliza] AssociacaoApplicationService - substituirCargoDefaultPorWakander");
+	}
+
+	@Override
+	public CompletableFuture<Integer> contaQuantosSemCargoExistem() {
+		return discordService.contaQuantosSemCargoExistem();
 	}
 }

@@ -1,6 +1,9 @@
 package com.example.demo.associacao.application.service;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+
+import org.springframework.http.ResponseEntity;
 
 import com.example.demo.associacao.application.api.TokenResponse;
 import com.example.demo.associacao.domain.AssociacaoDiscord;
@@ -12,5 +15,6 @@ public interface AssociacaoService {
 	List<AssociacaoDiscord> lista();
 	void deleteAll();
 	void desassociar(String token);
-	void substituirCargoDefaultPorWakander();
+	void substituirCargoDefaultPorWakander(String idDiscord);
+	CompletableFuture<Integer> contaQuantosSemCargoExistem();
 }

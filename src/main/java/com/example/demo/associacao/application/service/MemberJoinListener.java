@@ -86,7 +86,7 @@ public class MemberJoinListener extends ListenerAdapter {
                     "%s, Seja bem-vindo à Guild Wakanda!👋 \n" +
                     "Foi enviada uma mensagem no seu privado para validar sua entrada.\n" +
                     "Caso não encontre, acesse: https://discord.com/channels/@me/%s",
-                    member.getAsMention(), ID_BOT)).queue();
+                    member.getAsMention(), channel.getId())).queue();
             },
             falha -> {
                 notificarFalhaNaDM(member, channel.getJDA().getGuildById(member.getGuild().getId()));
