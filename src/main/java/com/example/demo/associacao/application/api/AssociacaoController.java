@@ -56,7 +56,7 @@ public class AssociacaoController {
 	@GetMapping("/delete")
 	public String deleteAll() {
 		associacaoService.deleteAll();
-		return "Dados Deletas com sucesso";
+		return "Dados Deletados com sucesso";
 	}
 
 	@GetMapping("/{token}/desassociar")
